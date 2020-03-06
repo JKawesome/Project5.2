@@ -39,4 +39,32 @@ public class Node
     {
         return prevNode;
     }
+
+    public boolean equals(Object other)
+    {
+        if(other == null)
+        {
+            return false;
+        }
+        if(!other.getClass().equals(this.getClass()))
+        {
+            return false;
+        }
+
+        Node o = (Node)other;
+        if(this.g == o.g && this.h == o.h &&
+                this.f == o.f && this.pos.equals(o.pos))
+        {
+            if(this.prevNode != null && o.prevNode != null)
+            {
+                return this.prevNode.equals(o.prevNode);
+            }
+            else if(this.prevNode == null && o.prevNode == null)
+            {
+                return true;
+            }
+        }
+        return false;
+
+    }
 }

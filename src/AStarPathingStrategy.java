@@ -36,10 +36,12 @@ class AStarPathingStrategy
                     .filter(pt -> !closed.containsKey(pt))
                     .collect(Collectors.toList());
 
-            if(nextPossible != null && nextPossible.contains(end))
+            //if(nextPossible != null && nextPossible.contains(end))
+            if(withinReach.test(currNode.getPos(), end))
             {
-                finishedPath = new Node(currNode.getG() + 1,
-                        0, end, currNode);
+//                finishedPath = new Node(currNode.getG() + 1,
+//                        0, end, currNode);
+                finishedPath = currNode;
                 break;
             }
 
@@ -74,7 +76,7 @@ class AStarPathingStrategy
 
         if(finishedPath != null)
         {
-            while(finishedPath != null)
+            while(finishedPath != null && !finishedPath.equals(closed.get(start)))
             {
                 path.add(0, finishedPath.getPos());
                 finishedPath = finishedPath.getPrevNode();
