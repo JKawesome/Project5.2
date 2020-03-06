@@ -25,6 +25,7 @@ public class VirtualMain extends PApplet
    private PathingStrategy strategy = new AStarPathingStrategy();
 
 
+   //BUTTHEAD
    private List<PImage> imgs;
    private List<PImage> playerImgs;
    private static final int ANIMATION_TIME = 100;
