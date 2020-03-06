@@ -87,6 +87,6 @@ class AStarPathingStrategy
 
     public int manhattanDist(Point start, Point end)
     {
-        return Math.abs(start.x - end.x) + Math.abs(start.y - end.y);
+        return Math.abs(start.getX() - end.getX()) + Math.abs(start.getY() - end.getY());
     }
 }
