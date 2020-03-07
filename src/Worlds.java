@@ -1,14 +1,19 @@
-public abstract class Worlds
-{
+public abstract class Worlds {
     private int numRows;
     private int numCols;
     private Point exit;
+    private Point start;
 
-    public Worlds(int numRows, int numCols, Point exit)
-    {
+    public Worlds(int numRows, int numCols, Point start, Point exit) {
         this.numRows = numRows;
         this.numCols = numCols;
+        this.start = start;
         this.exit = exit;
+    }
+
+    public Point getStart()
+    {
+        return start;
     }
 
     public Point getExit()

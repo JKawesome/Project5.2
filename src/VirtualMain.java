@@ -12,10 +12,13 @@ public class VirtualMain extends PApplet
    private PImage obstacle;
    private PImage goal;
    private PImage blackScreen;
+
    private PImage camBreaker;
+   private PImage invisibleMan;
+   private PImage runner;
    private List<PImage> playerImgs;
 
-   //private boolean blackScreenTime = false;
+   private boolean blackScreenTime = false;
 
    //TIME
    private final int SECOND = 1000;
@@ -23,7 +26,6 @@ public class VirtualMain extends PApplet
 
 
    //CURRENT VIEWLEVEL
-
 
    //Grid portion
    private static final int TILE_SIZE = 32;
@@ -39,16 +41,22 @@ public class VirtualMain extends PApplet
    private Worlds currentWorld;
 
 
-//   private Point wPos;
 //for now creating player
    Player p1;
 
    //for now creating CamBreaker
-   CamBreaker cB;
+   Entity cB;
+
+   //creating invisman
+   Entity iM;
+
+   //creating runner
+   Entity run;
+
+   List<Entity> entities = new ArrayList<>();
 
 
    private Point goalPos;
-   private boolean foundPath = false;
 
    public void settings()
    {
@@ -58,9 +66,7 @@ public class VirtualMain extends PApplet
    public void setup()
    {
       currentWorld = world1;
-      //creating entities
-      p1 = new Player("Bob", new Point(2, 2));
-      cB = new CamBreaker("CamBreaker", new Point(4, 4), world1);
+
 
 
       goalPos = new Point(14, 13);
@@ -74,6 +80,10 @@ public class VirtualMain extends PApplet
 
       camBreaker = loadImage("images/CamBreaker1.png");
 
+      invisibleMan = loadImage("images/InvisibleMan1.png");
+
+      runner = loadImage("images/Runner1.png");
+
 
 
       background = loadImage("images/grass.bmp");
@@ -86,6 +96,19 @@ public class VirtualMain extends PApplet
 
       current_image = 1;
       next_time = 0;
+
+
+      //creating entities
+      p1 = new Player("Bob", new Point(2, 2));
+//      cB = new CamBreaker("CamBreaker", new Point(4, 4), world1, camBreaker);
+//      iM = new InvisibleMan("InvisibleMan", new Point(4, 4), world1, invisibleMan);
+//      run = new Runner("runner", new Point(4, 4), world1, runner);
+      cB = EntityFactory.createEntity("CamBreaker", world1, camBreaker);
+      iM = EntityFactory.createEntity("InvisibleMan", world1, invisibleMan);
+      run = EntityFactory.createEntity("Runner", world1, runner);
+      entities.add(cB);
+      entities.add(iM);
+      entities.add(run);
    }
 
    private static void initialize_grid(GridValues[][] grid)
@@ -116,17 +139,16 @@ public class VirtualMain extends PApplet
       grid[13][14] = GridValues.GOAL;
    }
 
-//   private void initialize_black_screen(GridValues[][] grid)
-//   {
-//      this.blackScreenTime = true;
-//      for (int row = 0; row < grid.length; row++)
-//      {
-//         for (int col = 0; col < grid[row].length; col++)
-//         {
-//            grid[row][col] = GridValues.BLACKSCREEN;
-//         }
-//      }
-//   }
+   public static void initialize_black_screen(GridValues[][] grid)
+   {
+      for (int row = 0; row < grid.length; row++)
+      {
+         for (int col = 0; col < grid[row].length; col++)
+         {
+            grid[row][col] = GridValues.BLACKSCREEN;
+         }
+      }
+   }
 
 
    private static void initialize_grid2(GridValues[][] grid)
@@ -164,37 +186,72 @@ public class VirtualMain extends PApplet
       
       draw_grid();
 
+      //NEED TO CHANGE THIS TO DO WITH THE LIST
+      if(((Runner)run).isRunning())
+      {
+         ((Runner)run).running();
+         if(changeWorlds(run))
+         {
+            ((Runner)run).setRunning();
+         }
+      }
+
       //EACH SECOND PASSED
       if(next_time < time)
       {
          next_time = time + SECOND;
          System.out.println(currentSec);
-         System.out.println(cB.getPos());
+         System.out.println(p1.getPos());
 
 
-         cB.randomMovementTimer();
-         //if CamBreaker walks on exit then transports to other world
-         if(cB.getPos().equals(cB.getWorld().getExit()))
+         for(Entity entity: entities)
          {
-            if(cB.getWorld().equals(world1))
+            if(entity.getClass().equals(Runner.class))
             {
-               cB.setWorld(world2);
+               if(!((Runner)entity).isRunning())
+               {
+                  entity.randomMovementTimer();
+                  if(entity.getWorld().equals(this.currentWorld))
+                  {
+                     entity.stareDecrease();
+                  }
+               }
             }
             else
             {
-               cB.setWorld(world1);
+               entity.randomMovementTimer();
+               if(entity.getWorld().equals(this.currentWorld))
+               {
+                  entity.stareDecrease();
+               }
             }
-            cB.setPos(new Point(1, 1));
+
          }
+
          currentSec += 1;
       }
 
       //printing player
       image(playerImgs.get(p1.getCurrent_image()), p1.getPos().getX() * TILE_SIZE, p1.getPos().getY() * TILE_SIZE);
 
-      if(cB.getWorld().equals(currentWorld))
+
+      for(Entity entity: entities)
       {
-         image(camBreaker, cB.getPos().getX() * TILE_SIZE, cB.getPos().getY() * TILE_SIZE);
+         if(entity.getWorld().equals(currentWorld))
+         {
+            if(entity.getClass().equals(InvisibleMan.class))
+            {
+               if(!((InvisibleMan)entity).isInvis())
+               {
+                  image(entity.getImage(), entity.getPos().getX() * TILE_SIZE, entity.getPos().getY() * TILE_SIZE);
+               }
+            }
+            else
+            {
+               image(entity.getImage(), entity.getPos().getX() * TILE_SIZE, entity.getPos().getY() * TILE_SIZE);
+            }
+         }
+         changeWorlds(entity);
       }
 
    }
@@ -209,6 +266,26 @@ public class VirtualMain extends PApplet
             draw_tile(row, col);
          }
       }
+   }
+
+
+   public boolean changeWorlds(Entity entity)
+   {
+      //if CamBreaker walks on exit then transports to other world
+      if(entity.getPos().equals(entity.getWorld().getExit()))
+      {
+         if(entity.getWorld().equals(world1))
+         {
+            entity.setWorld(world2);
+         }
+         else
+         {
+            entity.setWorld(world1);
+         }
+         entity.setPos(new Point(1, 1));
+         return true;
+      }
+      return false;
    }
    
 

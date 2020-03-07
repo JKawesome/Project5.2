@@ -7,7 +7,7 @@ public class World2 extends Worlds
 
     public World2(int numRows, int numCols)
     {
-        super(numRows, numCols, new Point(7,5));
+        super(numRows, numCols, new Point(1, 1), new Point(7,5));
     }
 
 
