@@ -36,12 +36,11 @@ class AStarPathingStrategy
                     .filter(pt -> !closed.containsKey(pt))
                     .collect(Collectors.toList());
 
-            //if(nextPossible != null && nextPossible.contains(end))
             if(withinReach.test(currNode.getPos(), end))
             {
-//                finishedPath = new Node(currNode.getG() + 1,
-//                        0, end, currNode);
-                finishedPath = currNode;
+                //include last one
+               finishedPath = new Node(currNode.getG() + 1,
+                        0, end, currNode);
                 break;
             }
 

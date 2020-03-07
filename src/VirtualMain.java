@@ -169,10 +169,23 @@ public class VirtualMain extends PApplet
       {
          next_time = time + SECOND;
          System.out.println(currentSec);
-         System.out.println(p1.getPos());
+         System.out.println(cB.getPos());
 
 
          cB.randomMovementTimer();
+         //if CamBreaker walks on exit then transports to other world
+         if(cB.getPos().equals(cB.getWorld().getExit()))
+         {
+            if(cB.getWorld().equals(world1))
+            {
+               cB.setWorld(world2);
+            }
+            else
+            {
+               cB.setWorld(world1);
+            }
+            cB.setPos(new Point(1, 1));
+         }
          currentSec += 1;
       }
 
