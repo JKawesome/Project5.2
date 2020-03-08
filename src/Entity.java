@@ -5,4 +5,11 @@ public class Entity
     {
         this.name = name;
     }
+
+    public Point getPosition() {
+        return null;
+    }
+
+    public void setRoom(Room room) {
+    }
 }

@@ -9,6 +9,10 @@ import java.util.stream.Collectors;
 
 public class VirtualMain extends PApplet
 {
+
+
+
+   private static Level level;
    private PImage wyvern;
    private int current_image;
    private long next_time;
@@ -54,6 +58,9 @@ public class VirtualMain extends PApplet
       goalPos = new Point(14, 13);
 
 
+
+      level = LevelFactory.createLevel(1);
+
 //      imgs = new ArrayList<>();
 //      imgs.add(loadImage("images/wyvern1.bmp"));
 //      imgs.add(loadImage("images/wyvern2.bmp"));
@@ -72,6 +79,8 @@ public class VirtualMain extends PApplet
       obstacle = loadImage("images/vein.bmp");
       goal = loadImage("images/water.bmp");
       blackScreen = loadImage("images/blackScreen.bmp");
+
+      //todo - I may make this neater
 
       grid = new GridValues[ROWS][COLS];
       initialize_grid(grid);
@@ -128,6 +137,40 @@ public class VirtualMain extends PApplet
          for (int col = 0; col < grid[row].length; col++)
          {
             grid[row][col] = GridValues.BACKGROUND;
+         }
+      }
+
+      for (int row = 2; row < 8; row++)
+      {
+         grid[row][row + 5] = GridValues.OBSTACLE;
+      }
+
+      for (int row = 8; row < 12; row++)
+      {
+         grid[row][19 - row] = GridValues.OBSTACLE;
+      }
+
+      for (int col = 1; col < 8; col++)
+      {
+         grid[11][col] = GridValues.OBSTACLE;
+      }
+
+      grid[13][14] = GridValues.GOAL;
+      grid[13][15] = GridValues.GOAL;
+   }
+
+   private static void initialize_level_grid(GridValues[][] grid)
+   {
+      for (int row = 0; row < grid.length; row++)
+      {
+         for (int col = 0; col < grid[row].length; col++)
+         {
+            GridValues type = GridValues.BACKGROUND;
+            if(level.getRoom(0).getType(col,row) == 2 )
+               type = GridValues.BLACKSCREEN;
+            if(level.getRoom(0).getType(col,row) == 1)
+               type = GridValues.BACKGROUND;
+            grid[row][col] = type;
          }
       }
 
@@ -249,6 +292,10 @@ public class VirtualMain extends PApplet
       {
          grid = new GridValues[ROWS][COLS];
          initialize_black_screen(grid);
+      }
+      else if(key == 'n'){
+         grid = new GridValues[level.getRoom(1).getNumRows()][level.getRoom(1).getNumCols()];
+         initialize_level_grid(grid);
       }
    }
 
