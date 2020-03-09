@@ -5,14 +5,13 @@ import java.util.LinkedList;
 import processing.core.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
-import java.util.stream.Collectors;
 
 public class VirtualMain extends PApplet
 {
 
 
 
-   private static Level level;
+   private static Level level; // todo - probably we make this not static
    private PImage wyvern;
    private int current_image;
    private long next_time;
@@ -21,6 +20,8 @@ public class VirtualMain extends PApplet
    private PImage goal;
    private List<Point> path;
    private PImage blackScreen;
+
+   private PImage wall, floor, door, camScreen;
 
    private boolean blackScreenTime = false;
    private final int BLACKSTIME = 1000;
@@ -40,7 +41,8 @@ public class VirtualMain extends PApplet
    private static final int ROWS = 15;
    private static final int COLS = 20;
 
-   private static enum GridValues { BACKGROUND, OBSTACLE, GOAL, BLACKSCREEN};
+
+   private static enum GridValues { BACKGROUND, OBSTACLE, GOAL, BLACKSCREEN, WALL, FLOOR, DOOR, CAMSCREEN};
 
    private Point wPos;
    private Point goalPos;
@@ -57,9 +59,7 @@ public class VirtualMain extends PApplet
       wPos = new Point(2, 2);
       goalPos = new Point(14, 13);
 
-
-
-      level = LevelFactory.createLevel(1);
+      level = new Level();
 
 //      imgs = new ArrayList<>();
 //      imgs.add(loadImage("images/wyvern1.bmp"));
@@ -80,7 +80,12 @@ public class VirtualMain extends PApplet
       goal = loadImage("images/water.bmp");
       blackScreen = loadImage("images/blackScreen.bmp");
 
-      //todo - I may make this neater
+      wall = obstacle;//loadImage("images/wall_tile.png");//Room.getFilenameOfType(Room.WALL));
+      floor = goal; //loadImage("images/skull_floor_tile.png");
+      door = blackScreen;//loadImage("images/camera_screen_icon.gif");
+      camScreen = background;//loadImage("images/camera_screen_icon.gif");
+
+
 
       grid = new GridValues[ROWS][COLS];
       initialize_grid(grid);
@@ -165,32 +170,42 @@ public class VirtualMain extends PApplet
       {
          for (int col = 0; col < grid[row].length; col++)
          {
-            GridValues type = GridValues.BACKGROUND;
-            if(level.getRoom(0).getType(col,row) == 2 )
-               type = GridValues.BLACKSCREEN;
-            if(level.getRoom(0).getType(col,row) == 1)
-               type = GridValues.BACKGROUND;
-            grid[row][col] = type;
+            switch(level.getRoom(0).getType(col,row)){
+               case Room.WALL:
+                  grid[row][col] =GridValues.WALL;
+                  break;
+               case Room.DOOR:
+                  grid[row][col] =GridValues.DOOR;
+                  break;
+               case Room.CAMSCREEN:
+                  grid[row][col] =GridValues.CAMSCREEN;
+                  break;
+               case Room.FLOOR:
+                  grid[row][col] =GridValues.FLOOR;
+                  break;
+
+            }
+
          }
       }
-
-      for (int row = 2; row < 8; row++)
-      {
-         grid[row][row + 5] = GridValues.OBSTACLE;
-      }
-
-      for (int row = 8; row < 12; row++)
-      {
-         grid[row][19 - row] = GridValues.OBSTACLE;
-      }
-
-      for (int col = 1; col < 8; col++)
-      {
-         grid[11][col] = GridValues.OBSTACLE;
-      }
-
-      grid[13][14] = GridValues.GOAL;
-      grid[13][15] = GridValues.GOAL;
+//
+//      for (int row = 2; row < 8; row++)
+//      {
+//         grid[row][row + 5] = GridValues.OBSTACLE;
+//      }
+//
+//      for (int row = 8; row < 12; row++)
+//      {
+//         grid[row][19 - row] = GridValues.OBSTACLE;
+//      }
+//
+//      for (int col = 1; col < 8; col++)
+//      {
+//         grid[11][col] = GridValues.OBSTACLE;
+//      }
+//
+//      grid[13][14] = GridValues.GOAL;
+//      grid[13][15] = GridValues.GOAL;
    }
 
    public void draw()
@@ -267,6 +282,18 @@ public class VirtualMain extends PApplet
          case BLACKSCREEN:
             image(blackScreen, col * TILE_SIZE, row * TILE_SIZE);
             break;
+         case WALL:
+            image(wall, col * TILE_SIZE, row * TILE_SIZE);
+            break;
+         case FLOOR:
+            image(floor, col * TILE_SIZE, row * TILE_SIZE);
+            break;
+         case DOOR:
+            image(door, col * TILE_SIZE, row * TILE_SIZE);
+            break;
+         case CAMSCREEN:
+            image(camScreen, col * TILE_SIZE, row * TILE_SIZE);
+            break;
       }
    }
 
@@ -294,7 +321,7 @@ public class VirtualMain extends PApplet
          initialize_black_screen(grid);
       }
       else if(key == 'n'){
-         grid = new GridValues[level.getRoom(1).getNumRows()][level.getRoom(1).getNumCols()];
+         grid = new GridValues[level.getRoom(0).getNumRows()][level.getRoom(0).getNumCols()];
          initialize_level_grid(grid);
       }
    }

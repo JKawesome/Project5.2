@@ -1,21 +1,16 @@
-public abstract class Level {
+public class Level {
 
     private Room[] rooms;
     private Entity[] entities;
 
 
-    public Level(Room[] rooms, Entity[] entities){
-        this.rooms = rooms;
-        this.entities = entities;
+    public Level( /*Entity[] entities*/){
+        this.rooms = RoomFactory.createRooms();
+        //this.entities = entities;
     }
 
 
     public Room getRoom(int i){
-        switch(i){
-            case 1:
-                return rooms[0];
-            default:
-                return rooms[0];
-        }
-    };
+        return rooms[i];
+    }
 }
