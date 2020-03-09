@@ -319,7 +319,7 @@ public class VirtualMain extends PApplet
       }
       if(level.getCurrentRoom().equals(level.getRoom(0)))
       {
-         if(key == 'p' && ((RoomHome)p1.getRoom()).getDoorButton().equals(p1.getPos()))
+         if(key == ' ' && ((RoomHome)p1.getRoom()).getDoorButton().equals(p1.getPos()))
          {
             ((RoomHome)level.getCurrentRoom()).leftEnd();
             for(Entity entity : level.getEntities())
@@ -333,14 +333,14 @@ public class VirtualMain extends PApplet
                }
             }
          }
-         else if(key == 'p' && ((RoomHome)p1.getRoom()).getCameraButton().equals(p1.getPos()))
+         else if(key == ' ' && ((RoomHome)p1.getRoom()).getCameraButton().equals(p1.getPos()))
          {
             level.setRoom(1);
          }
       }
       else
       {
-         if(key == 'p')
+         if(key == ' ')
          {
             level.setRoom(0);
          }
