@@ -26,6 +26,14 @@ public abstract class Room {
         this.startPoint = new Point(numCols/2,numRows/2);// places start in the center
     }
 
+    public Point getStart(){
+        return startPoint;
+    }
+
+    public int nextRoom(Point p) {
+        return isDoorNum(p);
+    }
+
     abstract Point getDoor(int i);
 
     abstract void createBackground();

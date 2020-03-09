@@ -12,4 +12,16 @@ public class Entity
 
     public void setRoom(Room room) {
     }
+
+    public Room getRoom() {
+        return null;
+    }
+
+    public Point getPos() {
+        return null;
+    }
+
+    public void setPos(Point start) {
+
+    }
 }

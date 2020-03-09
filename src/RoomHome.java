@@ -30,6 +30,9 @@ public class RoomHome extends Room {
         return doorButton;
     }
 
+
+
+
     @Override
     public void createBackground() {
         for(int x = 0; x< getNumCols(); x++){

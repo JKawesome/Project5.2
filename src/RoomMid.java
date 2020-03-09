@@ -12,6 +12,9 @@ public class RoomMid extends Room {
         createBackground();
     }
 
+
+
+
     @Override
     public Point getDoor(int i) {
         switch (i){
