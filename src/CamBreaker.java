@@ -3,9 +3,9 @@ import processing.core.PImage;
 
 public class CamBreaker extends Entity
 {
-    public CamBreaker(String name, Point pos, Worlds world, PImage image)
+    public CamBreaker(Point pos, Room room, PImage image)
     {
-        super(name, pos, world, image);
+        super(pos, room, image);
     }
 
 

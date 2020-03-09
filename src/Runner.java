@@ -6,9 +6,9 @@ public class Runner extends Entity
 {
     private boolean running = false;
 
-    public Runner(String name, Point pos, Worlds world, PImage image)
+    public Runner(Point pos, Room room, PImage image)
     {
-        super(name, pos, world, image);
+        super(pos, room, image);
     }
 
     public void setRunning()

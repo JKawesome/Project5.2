@@ -5,40 +5,45 @@ import processing.core.*;
 
 public class VirtualMain extends PApplet
 {
+   //GAMEMODES
+   private boolean game = false;
+
    //IMAGES
-   private int current_image;
-   private long next_time;
+   private long next_time = 0;
    private PImage background;
    private PImage obstacle;
    private PImage goal;
    private PImage blackScreen;
+   private PImage menuScreen;
 
    private PImage camBreaker;
    private PImage invisibleMan;
    private PImage runner;
    private List<PImage> playerImgs;
 
-   private boolean blackScreenTime = false;
-
    //TIME
    private final int SECOND = 1000;
    private int currentSec = 0;
 
 
-   //CURRENT VIEWLEVEL
-
    //Grid portion
    private static final int TILE_SIZE = 32;
-   private static enum GridValues { BACKGROUND, OBSTACLE, GOAL, BLACKSCREEN};
+   public static enum GridValues { BACKGROUND, OBSTACLE, GOAL, BLACKSCREEN, WALL, FLOOR, DOOR, CAMSCREEN};
    private GridValues[][] grid;
    private static final int ROWS = 15;
    private static final int COLS = 20;
 
 
-   //creating worlds/levles
-   private World1 world1 = new World1(ROWS, COLS);
-   private World2 world2 = new World2(ROWS, COLS);
-   private Worlds currentWorld;
+   //creating worlds/levels
+//   private World1 world1 = new World1(ROWS, COLS);
+//   private World2 world2 = new World2(ROWS, COLS);
+//   private Room currentRoom;
+
+   //creating levels
+   private static Level level;
+
+   //for rooms
+   private PImage wall, floor, door, camScreen;
 
 
 //for now creating player
@@ -53,8 +58,6 @@ public class VirtualMain extends PApplet
    //creating runner
    Entity run;
 
-   List<Entity> entities = new ArrayList<>();
-
 
    private Point goalPos;
 
@@ -65,10 +68,6 @@ public class VirtualMain extends PApplet
 
    public void setup()
    {
-      currentWorld = world1;
-
-
-
       goalPos = new Point(14, 13);
 
 
@@ -90,25 +89,29 @@ public class VirtualMain extends PApplet
       obstacle = loadImage("images/vein.bmp");
       goal = loadImage("images/water.bmp");
       blackScreen = loadImage("images/blackScreen.bmp");
+      menuScreen = loadImage("images/menuScreen.png");
 
+
+      //for each room
+      wall = obstacle;//loadImage("images/wall_tile.png");//Room.getFilenameOfType(Room.WALL));
+      floor = goal; //loadImage("images/skull_floor_tile.png");
+      door = blackScreen;//loadImage("images/camera_screen_icon.gif");
+      camScreen = background;//loadImage("images/camera_screen_icon.gif");
+
+      level = new Level(camBreaker, invisibleMan, runner);
       grid = new GridValues[ROWS][COLS];
       initialize_grid(grid);
 
-      current_image = 1;
-      next_time = 0;
 
 
       //creating entities
-      p1 = new Player("Bob", new Point(2, 2));
-//      cB = new CamBreaker("CamBreaker", new Point(4, 4), world1, camBreaker);
-//      iM = new InvisibleMan("InvisibleMan", new Point(4, 4), world1, invisibleMan);
-//      run = new Runner("runner", new Point(4, 4), world1, runner);
-      cB = EntityFactory.createEntity("CamBreaker", world1, camBreaker);
-      iM = EntityFactory.createEntity("InvisibleMan", world1, invisibleMan);
-      run = EntityFactory.createEntity("Runner", world1, runner);
-      entities.add(cB);
-      entities.add(iM);
-      entities.add(run);
+
+      p1 = new Player("Bob", new Point(2, 2), level.getRoom(0));
+   }
+
+   public void setGrid(GridValues[][] grid)
+   {
+      this.grid = grid;
    }
 
    private static void initialize_grid(GridValues[][] grid)
@@ -182,78 +185,83 @@ public class VirtualMain extends PApplet
 
    public void draw()
    {
-      long time = System.currentTimeMillis();
-      
-      draw_grid();
+      if(game) {
+         long time = System.currentTimeMillis();
 
-      //NEED TO CHANGE THIS TO DO WITH THE LIST
-      if(((Runner)run).isRunning())
-      {
-         ((Runner)run).running();
-         if(changeWorlds(run))
-         {
-            ((Runner)run).setRunning();
-         }
-      }
+         draw_grid();
 
-      //EACH SECOND PASSED
-      if(next_time < time)
-      {
-         next_time = time + SECOND;
-         System.out.println(currentSec);
-         System.out.println(p1.getPos());
+         //NEED TO CHANGE THIS TO DO WITH THE LIST
+//         if (((Runner) run).isRunning()) {
+//            ((Runner) run).running();
+//            if (changeWorlds(run)) {
+//               ((Runner) run).setRunning();
+//            }
+//         }
+
+         //EACH SECOND PASSED
+         if (next_time < time) {
+            next_time = time + SECOND;
+            System.out.println(currentSec);
+            System.out.println(p1.getPos());
 
 
-         for(Entity entity: entities)
-         {
-            if(entity.getClass().equals(Runner.class))
-            {
-               if(!((Runner)entity).isRunning())
-               {
+            for (Entity entity : level.getEntities()) {
+               if (entity.getClass().equals(Runner.class)) {
+                  if (!((Runner) entity).isRunning()) {
+                     entity.randomMovementTimer();
+                     if (entity.getRoom().equals(this.level.getCurrentRoom())) {
+                        entity.stareDecrease();
+                     }
+                  }
+               } else {
                   entity.randomMovementTimer();
-                  if(entity.getWorld().equals(this.currentWorld))
-                  {
+                  if (entity.getRoom().equals(this.level.getCurrentRoom())) {
                      entity.stareDecrease();
                   }
                }
-            }
-            else
-            {
-               entity.randomMovementTimer();
-               if(entity.getWorld().equals(this.currentWorld))
-               {
-                  entity.stareDecrease();
-               }
+
             }
 
+            currentSec += 1;
          }
 
-         currentSec += 1;
-      }
-
-      //printing player
-      image(playerImgs.get(p1.getCurrent_image()), p1.getPos().getX() * TILE_SIZE, p1.getPos().getY() * TILE_SIZE);
-
-
-      for(Entity entity: entities)
-      {
-         if(entity.getWorld().equals(currentWorld))
+         //printing player
+         if(level.getCurrentRoom().equals(p1.getRoom()))
          {
-            if(entity.getClass().equals(InvisibleMan.class))
-            {
-               if(!((InvisibleMan)entity).isInvis())
-               {
+            image(playerImgs.get(p1.getCurrent_image()), p1.getPos().getX() * TILE_SIZE, p1.getPos().getY() * TILE_SIZE);
+         }
+
+
+
+         for (Entity entity : level.getEntities()) {
+            if (entity.getRoom().equals(this.level.getCurrentRoom())) {
+               if (entity.getClass().equals(InvisibleMan.class)) {
+                  if (!((InvisibleMan) entity).isInvis()) {
+                     image(entity.getImage(), entity.getPos().getX() * TILE_SIZE, entity.getPos().getY() * TILE_SIZE);
+                  }
+               } else {
                   image(entity.getImage(), entity.getPos().getX() * TILE_SIZE, entity.getPos().getY() * TILE_SIZE);
                }
             }
-            else
-            {
-               image(entity.getImage(), entity.getPos().getX() * TILE_SIZE, entity.getPos().getY() * TILE_SIZE);
-            }
+            changeWorlds(entity);
          }
-         changeWorlds(entity);
       }
+      else if(game == false)
+      {
+         //MAIN MENU
+         image(menuScreen, 0, 0);
+      }
+   }
 
+   public boolean changeWorlds(Entity entity)
+   {
+      //CHANGE THIS LATER YEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+      if(entity.getRoom().isDoor(entity.getPos()))
+      {
+         level.nextRoom(entity);
+         return true;
+      }
+      return false;
    }
    
 
@@ -269,24 +277,7 @@ public class VirtualMain extends PApplet
    }
 
 
-   public boolean changeWorlds(Entity entity)
-   {
-      //if CamBreaker walks on exit then transports to other world
-      if(entity.getPos().equals(entity.getWorld().getExit()))
-      {
-         if(entity.getWorld().equals(world1))
-         {
-            entity.setWorld(world2);
-         }
-         else
-         {
-            entity.setWorld(world1);
-         }
-         entity.setPos(new Point(1, 1));
-         return true;
-      }
-      return false;
-   }
+
    
 
    private void draw_tile(int row, int col)
@@ -305,6 +296,19 @@ public class VirtualMain extends PApplet
          case BLACKSCREEN:
             image(blackScreen, col * TILE_SIZE, row * TILE_SIZE);
             break;
+            //FOR ROOMS
+         case WALL:
+            image(wall, col * TILE_SIZE, row * TILE_SIZE);
+            break;
+         case FLOOR:
+            image(floor, col * TILE_SIZE, row * TILE_SIZE);
+            break;
+         case DOOR:
+            image(door, col * TILE_SIZE, row * TILE_SIZE);
+            break;
+         case CAMSCREEN:
+            image(camScreen, col * TILE_SIZE, row * TILE_SIZE);
+            break;
       }
    }
 
@@ -315,28 +319,28 @@ public class VirtualMain extends PApplet
 
    public void keyPressed()
    {
-      if(key == 'w' || key == 'a' ||
-              key == 's' || key == 'd')
+      if(((key == 'w' || key == 'a' ||
+              key == 's' || key == 'd')) && level.getCurrentRoom().equals(p1.getRoom()))
       {
-         p1.move(key, currentWorld);
-         if(currentWorld.equals(world1) && p1.getPos().equals(new Point(13, 14)))
-         {
-            currentWorld = world2;
-            p1.setPos(new Point(1, 1));
-            initialize_grid2(grid);
-         }
-         else if(currentWorld.equals(world2) && p1.getPos().equals(new Point(14, 14)))
-         {
-            currentWorld = world1;
-            p1.setPos(new Point(1, 1));
-            initialize_grid(grid);
-         }
+         p1.move(key);
       }
-//      else if(key == 'o')
-//      {
-//         grid = new GridValues[ROWS][COLS];
-//         initialize_black_screen(grid);
-//      }
+      if(key == 'u')
+      {
+         level.setRoom(0);
+      }
+      if(key == 'i')
+      {
+         level.setRoom(1);
+      }
+      if(key == 'o')
+      {
+         level.setRoom(2);
+      }
+      if(key == 'p')
+      {
+         level.setRoom(3);
+      }
+
    }
 
 
@@ -344,12 +348,29 @@ public class VirtualMain extends PApplet
 
    public void mousePressed()
    {
-      Point pressed = mouseToPoint(mouseX, mouseY);
+      if(game)
+      {
+         Point pressed = mouseToPoint(mouseX, mouseY);
 
-     if (grid[pressed.getY()][pressed.getX()] == GridValues.OBSTACLE)
-        grid[pressed.getY()][pressed.getX()] = GridValues.BACKGROUND;
-     else if (grid[pressed.getY()][pressed.getX()] == GridValues.BACKGROUND)
-        grid[pressed.getY()][pressed.getX()] = GridValues.OBSTACLE;
+         if (grid[pressed.getY()][pressed.getX()] == GridValues.OBSTACLE)
+            grid[pressed.getY()][pressed.getX()] = GridValues.BACKGROUND;
+         else if (grid[pressed.getY()][pressed.getX()] == GridValues.BACKGROUND)
+            grid[pressed.getY()][pressed.getX()] = GridValues.OBSTACLE;
+      }
+      else
+      {
+         //System.out.println(mouseX + ", " + mouseY);
+         if(mouseX >= 37 && mouseX <= 600 &&
+            mouseY >= 37 && mouseY <= 180)
+         {
+            game = true;
+         }
+         else if(mouseX >= 37 && mouseX <= 600 &&
+                 mouseY >= 275 && mouseY <= 415)
+         {
+            System.out.println("Exit");
+         }
+      }
 
      redraw();
       
@@ -359,65 +380,4 @@ public class VirtualMain extends PApplet
    {
       return new Point(mouseX/TILE_SIZE, mouseY/TILE_SIZE);
    }
-
-//   private boolean findGoal(Point pos, Point goal, GridValues[][] grid, List<Point> path)
-//   {
-//      List<Point> points;
-//
-////      while (!neighbors(pos, goal))
-////      {
-//         points = strategy.computePath(pos, goalPos,
-//                              p ->  withinBounds(p, grid) && grid[p.y][p.x] != GridValues.OBSTACLE,
-//                              (p1, p2) -> neighbors(p1,p2),
-//                              PathingStrategy.CARDINAL_NEIGHBORS);
-////                              DIAGONAL_NEIGHBORS)
-////                              DIAGONAL_CARDINAL_NEIGHBORS);
-//
-//         if (points.size() == 0)
-//         {
-//            System.out.println("No path found");
-//            return false;
-//         }
-//
-//         //pos = points.get(0);
-//         //path.add(pos);
-//         path.addAll(points);
-////      }
-//
-//      return true;
-//   }
-//
-//
-//
-//   private static boolean neighbors(Point p1, Point p2)
-//   {
-//      return p1.x+1 == p2.x && p1.y == p2.y ||
-//             p1.x-1 == p2.x && p1.y == p2.y ||
-//             p1.x == p2.x && p1.y+1 == p2.y ||
-//             p1.x == p2.x && p1.y-1 == p2.y;
-//   }
-
-//   private static final Function<Point, Stream<Point>> DIAGONAL_NEIGHBORS =
-//      point ->
-//         Stream.<Point>builder()
-//            .add(new Point(point.x - 1, point.y - 1))
-//            .add(new Point(point.x + 1, point.y + 1))
-//            .add(new Point(point.x - 1, point.y + 1))
-//            .add(new Point(point.x + 1, point.y - 1))
-//            .build();
-//
-//
-//
-//   private static final Function<Point, Stream<Point>> DIAGONAL_CARDINAL_NEIGHBORS =
-//      point ->
-//         Stream.<Point>builder()
-//            .add(new Point(point.x - 1, point.y - 1))
-//            .add(new Point(point.x + 1, point.y + 1))
-//            .add(new Point(point.x - 1, point.y + 1))
-//            .add(new Point(point.x + 1, point.y - 1))
-//            .add(new Point(point.x, point.y - 1))
-//            .add(new Point(point.x, point.y + 1))
-//            .add(new Point(point.x - 1, point.y))
-//            .add(new Point(point.x + 1, point.y))
-//            .build();
 }

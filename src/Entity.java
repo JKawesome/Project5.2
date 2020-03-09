@@ -8,12 +8,12 @@ public abstract class Entity
 
     private String name;
     private Point pos;
-    private Worlds world;
+    private Room room;
     private PImage image;
 
     private final int STARE_TIME = 4;
     private final int RANDOM_MOVE_TIME = 2;
-    private final int NEXT_ROOM_TIME = 8;
+    private final int NEXT_ROOM_TIME = 20;
 
     private int currentStareTimer = STARE_TIME;
     private int randMoveTimer = RANDOM_MOVE_TIME;
@@ -29,11 +29,10 @@ public abstract class Entity
     private int pointIndex = 0;
 
 
-    public Entity(String name, Point pos, Worlds world, PImage image)
+    public Entity(Point pos, Room room, PImage image)
     {
-        this.name = name;
         this.pos = pos;
-        this.world = world;
+        this.room = room;
         this.image = image;
     }
 
@@ -43,14 +42,14 @@ public abstract class Entity
     }
 
 
-    public Worlds getWorld()
+    public Room getRoom()
     {
-        return world;
+        return room;
     }
 
-    public void setWorld(Worlds world)
+    public void setRoom(Room room)
     {
-        this.world = world;
+        this.room = room;
     }
 
     public Point getPos()
@@ -134,12 +133,15 @@ public abstract class Entity
         }
     }
 
+
     public void createPath()
     {
         pointIndex = 0;
-        points = strategy.computePath(pos, world.getExit(),
-                p ->  world.withinBounds(p),
-                (p1, p2) -> world.neighbors(p1,p2),
+        int randRoom = rand.nextInt(2);
+        System.out.println(randRoom);
+        points = strategy.computePath(pos, room.getDoor(randRoom),
+                p ->  room.withinBounds(p),
+                (p1, p2) -> neighbors(p1,p2),
                 PathingStrategy.CARDINAL_NEIGHBORS);
     }
 
@@ -170,11 +172,19 @@ public abstract class Entity
 
     private boolean move(Point p)
     {
-        if (world.withinBounds(p))
+        if (room.withinBounds(p))
         {
             pos = p;
             return true;
         }
         return false;
+    }
+
+    public static boolean neighbors(Point p1, Point p2)
+    {
+        return p1.getX()+1 == p2.getX() && p1.getY() == p2.getY() ||
+                p1.getX()-1 == p2.getX() && p1.getY() == p2.getY() ||
+                p1.getX() == p2.getX() && p1.getY()+1 == p2.getY() ||
+                p1.getX() == p2.getX() && p1.getY()-1 == p2.getY();
     }
 }

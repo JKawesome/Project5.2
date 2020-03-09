@@ -4,13 +4,13 @@ import processing.core.PImage;
 public class InvisibleMan extends Entity
 {
     private boolean currentInvis = false;
-    private final int INVIS_TIME = 4;
+    private final int INVIS_TIME = 6;
     private int invisTimer = INVIS_TIME;
 
 
-    public InvisibleMan (String name, Point pos, Worlds world, PImage image)
+    public InvisibleMan (Point pos, Room room, PImage image)
     {
-        super(name, pos, world, image);
+        super(pos, room, image);
     }
 
     public boolean isInvis()
