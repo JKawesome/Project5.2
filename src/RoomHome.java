@@ -20,6 +20,22 @@ public class RoomHome extends Room {
         createBackground();
     }
 
+    //DOES NOTHING
+    public int getClickedRoom(Point p)
+    {
+        return 0;
+    }
+
+    public Point getCameraButton()
+    {
+        return cameraButton;
+    }
+
+    public Point getDoorButton()
+    {
+        return doorButton;
+    }
+
 
     public boolean ending()
     {

@@ -25,6 +25,8 @@ public abstract class Room {
         start = new Point(numCols/2,numRows/2);
     }
 
+    public abstract int getClickedRoom(Point p);
+
     public boolean isBlackScreen()
     {
         return blackScreen;
@@ -54,9 +56,9 @@ public abstract class Room {
         return numRows;
     }
 
-    public int getType(int col, int row) {
+    public int getType(int x, int y) {
         try{
-            return background[col][row];
+            return background[x][y];
         }
         catch (IndexOutOfBoundsException e){
             return -1;
@@ -80,7 +82,8 @@ public abstract class Room {
     public boolean withinBounds(Point p)
     {
         return p.getY() >= 0 && p.getY() < numRows &&
-                p.getX() >= 0 && p.getX() < numCols;
+                p.getX() >= 0 && p.getX() < numCols &&
+                this.getType(p.getX(), p.getY())!= WALL;
     }
 
 //    public static String getFilenameOfType(int type){

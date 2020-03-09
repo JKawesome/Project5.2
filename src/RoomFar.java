@@ -16,6 +16,22 @@ public class RoomFar extends Room {
         createBackground();
     }
 
+    public int getClickedRoom(Point p)
+    {
+        if(p.equals(door1))
+        {
+            return LEFT_ROOM;
+        }
+        else if(p.equals(door2))
+        {
+            return RIGHT_ROOM;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+
     public int nextRoom(Point p)
     {
         if(p.equals(door1))

@@ -17,6 +17,22 @@ public class RoomMid extends Room {
         createBackground();
     }
 
+    public int getClickedRoom(Point p)
+    {
+        if(p.equals(door1))
+        {
+            return UPPER_ROOM;
+        }
+        else if(p.equals(door2))
+        {
+            return LOWER_ROOM;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+
 
     public int nextRoom(Point p)
     {

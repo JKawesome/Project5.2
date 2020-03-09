@@ -1,5 +1,6 @@
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Random;
 
 import processing.core.*;
 
@@ -155,11 +156,7 @@ public class VirtualMain extends PApplet
          }
          else
          {
-            if(!level.getCurrentRoom().equals(level.getPrevRoom()))
-            {
-               initialize_level_grid(grid);
-               level.setPrevRoom(level.getCurrentRoom());
-            }
+            initialize_level_grid(grid);
          }
 
 
@@ -320,23 +317,34 @@ public class VirtualMain extends PApplet
       {
          p1.move(key);
       }
-      if(key == 'u')
+      if(level.getCurrentRoom().equals(level.getRoom(0)))
       {
-         level.setRoom(0);
+         if(key == 'p' && ((RoomHome)p1.getRoom()).getDoorButton().equals(p1.getPos()))
+         {
+            ((RoomHome)level.getCurrentRoom()).leftEnd();
+            for(Entity entity : level.getEntities())
+            {
+               if(entity.getRoom().equals(level.getCurrentRoom()))
+               {
+                  Random rand = new Random();
+                  int randRoom = rand.nextInt(2) + 1;
+                  entity.setRoom(level.getRoom(randRoom));
+                  System.out.println(entity + "got kicked out");
+               }
+            }
+         }
+         else if(key == 'p' && ((RoomHome)p1.getRoom()).getCameraButton().equals(p1.getPos()))
+         {
+            level.setRoom(1);
+         }
       }
-      if(key == 'i')
+      else
       {
-         level.setRoom(1);
+         if(key == 'p')
+         {
+            level.setRoom(0);
+         }
       }
-      if(key == 'o')
-      {
-         level.setRoom(2);
-      }
-      if(key == 'p')
-      {
-         level.setRoom(3);
-      }
-
    }
 
 
@@ -347,11 +355,11 @@ public class VirtualMain extends PApplet
       if(game)
       {
          Point pressed = mouseToPoint(mouseX, mouseY);
-
-         if (grid[pressed.getY()][pressed.getX()] == GridValues.OBSTACLE)
-            grid[pressed.getY()][pressed.getX()] = GridValues.BACKGROUND;
-         else if (grid[pressed.getY()][pressed.getX()] == GridValues.BACKGROUND)
-            grid[pressed.getY()][pressed.getX()] = GridValues.OBSTACLE;
+         if(pressed.equals(level.getCurrentRoom().getDoor(0)) ||
+                 pressed.equals(level.getCurrentRoom().getDoor(1)))
+         {
+            level.setRoom(level.getClickedRoom(pressed));
+         }
       }
       else
       {
