@@ -1,5 +1,7 @@
 public class Level {
 
+
+
     private Room[] rooms;
     private Entity[] entities;
 
@@ -11,6 +13,12 @@ public class Level {
 
 
     public Room getRoom(int i){
-        return rooms[i];
+        try{
+            return rooms[i];
+        }
+        catch (IndexOutOfBoundsException e){
+            return null;
+        }
+
     }
 }

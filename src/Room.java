@@ -6,6 +6,8 @@ public abstract class Room {
     private int[][] background; //value for which background image to draw
     public static final int WALL = 1, FLOOR = 2, DOOR = 3, CAMSCREEN = 4;
 
+    private Point startPoint; // middle of room
+
 
     public Room(int numCols,int numRows/*, Entity[] entities*/){
 
@@ -17,6 +19,11 @@ public abstract class Room {
 //            occupancy[p.x][p.y] = entity;
 //        }
         this.background = new int[numCols][numRows];
+        makeStartPoint();
+    }
+
+    private void makeStartPoint() {
+        this.startPoint = new Point(numCols/2,numRows/2);// places start in the center
     }
 
     abstract Point getDoor(int i);
@@ -35,15 +42,23 @@ public abstract class Room {
     }
 
     public int getType(int col, int row) {
-        return background[col][row];
+        try{
+            return background[col][row];
+        }
+        catch (IndexOutOfBoundsException e){
+            return -1;
+        }
+
     }
 
-    public int[][] getBackground() {
-        return background;
-    }
 
     public void setBackground(int x, int y, int imageType) {
+
         this.background[x][y] = imageType;
+    }
+
+    public Point getStartPoint() {
+        return startPoint;
     }
 
 //    public static String getFilenameOfType(int type){

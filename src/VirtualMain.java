@@ -96,6 +96,8 @@ public class VirtualMain extends PApplet
 
    private static void initialize_grid(GridValues[][] grid)
    {
+
+
       for (int row = 0; row < grid.length; row++)
       {
          for (int col = 0; col < grid[row].length; col++)
@@ -137,6 +139,8 @@ public class VirtualMain extends PApplet
 
    private static void initialize_grid2(GridValues[][] grid)
    {
+
+
       for (int row = 0; row < grid.length; row++)
       {
          for (int col = 0; col < grid[row].length; col++)
@@ -170,7 +174,7 @@ public class VirtualMain extends PApplet
       {
          for (int col = 0; col < grid[row].length; col++)
          {
-            switch(level.getRoom(0).getType(col,row)){
+            switch(level.getRoom(2).getType(col,row)){
                case Room.WALL:
                   grid[row][col] =GridValues.WALL;
                   break;
@@ -182,6 +186,9 @@ public class VirtualMain extends PApplet
                   break;
                case Room.FLOOR:
                   grid[row][col] =GridValues.FLOOR;
+                  break;
+               default:
+                  grid[row][col] = GridValues.BLACKSCREEN;
                   break;
 
             }
@@ -321,7 +328,7 @@ public class VirtualMain extends PApplet
          initialize_black_screen(grid);
       }
       else if(key == 'n'){
-         grid = new GridValues[level.getRoom(0).getNumRows()][level.getRoom(0).getNumCols()];
+         grid = new GridValues[level.getRoom(2).getNumRows()][level.getRoom(2).getNumCols()];
          initialize_level_grid(grid);
       }
    }

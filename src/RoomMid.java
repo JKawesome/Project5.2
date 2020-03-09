@@ -1,15 +1,13 @@
-public class RoomHome extends Room {
+public class RoomMid extends Room {
 
 
-    private Point door1, door2, doorButton, cameraButton;
+    private Point door1, door2;
 
 
-    public RoomHome(){
-        super(10,10);
-        door1 = new Point(0, 5);
-        door2 = new Point(getNumCols()-1, 5);
-        doorButton = new Point(1,4);
-        cameraButton =new Point( 4,1);
+    public RoomMid(){
+        super(18,14);
+        door1 = new Point(getNumCols()/2, 0);
+        door2 = new Point(getNumRows()/2, 13);
 
         createBackground();
     }
@@ -24,10 +22,6 @@ public class RoomHome extends Room {
             default:
                 return null;
         }
-    }
-
-    public Point getDoorButton(){
-        return doorButton;
     }
 
     @Override
@@ -50,8 +44,6 @@ public class RoomHome extends Room {
 
         setBackground(door1.x,door1.y,DOOR);
         setBackground(door2.x,door2.y,DOOR);
-
-        setBackground(cameraButton.x,cameraButton.y, CAMSCREEN);
 
     }
 
