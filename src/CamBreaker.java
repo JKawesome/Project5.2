@@ -11,7 +11,7 @@ public class CamBreaker extends Entity
 
     public void executeAbility()
     {
-        //set a boolean to black screen on and only initialize tht black screen?
+        super.getRoom().setBlackScreen(true);
     }
 }
 

@@ -34,11 +34,6 @@ public class VirtualMain extends PApplet
    private static final int COLS = 20;
 
 
-   //creating worlds/levels
-//   private World1 world1 = new World1(ROWS, COLS);
-//   private World2 world2 = new World2(ROWS, COLS);
-//   private Room currentRoom;
-
    //creating levels
    private static Level level;
 
@@ -46,17 +41,8 @@ public class VirtualMain extends PApplet
    private PImage wall, floor, door, camScreen;
 
 
-//for now creating player
+   //for now creating player
    Player p1;
-
-   //for now creating CamBreaker
-   Entity cB;
-
-   //creating invisman
-   Entity iM;
-
-   //creating runner
-   Entity run;
 
 
    private Point goalPos;
@@ -100,7 +86,7 @@ public class VirtualMain extends PApplet
 
       level = new Level(camBreaker, invisibleMan, runner);
       grid = new GridValues[ROWS][COLS];
-      initialize_grid(grid);
+      initialize_level_grid(grid);
 
 
 
@@ -114,32 +100,26 @@ public class VirtualMain extends PApplet
       this.grid = grid;
    }
 
-   private static void initialize_grid(GridValues[][] grid)
-   {
-      for (int row = 0; row < grid.length; row++)
-      {
-         for (int col = 0; col < grid[row].length; col++)
-         {
-            grid[row][col] = GridValues.BACKGROUND;
+
+   private static void initialize_level_grid(GridValues[][] grid) {
+      for (int row = 0; row < grid.length; row++) {
+         for (int col = 0; col < grid[row].length; col++) {
+            switch (level.getRoom(0).getType(col, row)) {
+               case Room.WALL:
+                  grid[row][col] = GridValues.WALL;
+                  break;
+               case Room.DOOR:
+                  grid[row][col] = GridValues.DOOR;
+                  break;
+               case Room.CAMSCREEN:
+                  grid[row][col] = GridValues.CAMSCREEN;
+                  break;
+               case Room.FLOOR:
+                  grid[row][col] = GridValues.FLOOR;
+                  break;
+            }
          }
       }
-
-      for (int row = 2; row < 8; row++)
-      {
-         grid[row][row + 5] = GridValues.OBSTACLE;
-      }
-
-      for (int row = 8; row < 12; row++)
-      {
-         grid[row][19 - row] = GridValues.OBSTACLE;
-      }
-
-      for (int col = 1; col < 8; col++)
-      {
-         grid[11][col] = GridValues.OBSTACLE;
-      }
-
-      grid[13][14] = GridValues.GOAL;
    }
 
    public static void initialize_black_screen(GridValues[][] grid)
@@ -154,72 +134,56 @@ public class VirtualMain extends PApplet
    }
 
 
-   private static void initialize_grid2(GridValues[][] grid)
-   {
-      for (int row = 0; row < grid.length; row++)
-      {
-         for (int col = 0; col < grid[row].length; col++)
-         {
-            grid[row][col] = GridValues.BACKGROUND;
-         }
-      }
-
-      for (int row = 2; row < 8; row++)
-      {
-         grid[row][row + 5] = GridValues.OBSTACLE;
-      }
-
-      for (int row = 8; row < 12; row++)
-      {
-         grid[row][19 - row] = GridValues.OBSTACLE;
-      }
-
-      for (int col = 1; col < 8; col++)
-      {
-         grid[11][col] = GridValues.OBSTACLE;
-      }
-
-      grid[12][12] = GridValues.GOAL;
-      grid[13][15] = GridValues.GOAL;
-   }
-
    public void draw()
    {
       if(game) {
          long time = System.currentTimeMillis();
 
+
          draw_grid();
 
          //NEED TO CHANGE THIS TO DO WITH THE LIST
-//         if (((Runner) run).isRunning()) {
-//            ((Runner) run).running();
-//            if (changeWorlds(run)) {
-//               ((Runner) run).setRunning();
-//            }
-//         }
+         if (((Runner) level.getEntities()[2]).isRunning()) {
+            ((Runner) level.getEntities()[2]).running();
+            if (changeWorlds(((Runner) level.getEntities()[2]))) {
+               ((Runner) level.getEntities()[2]).setRunning();
+            }
+         }
+
+
 
          //EACH SECOND PASSED
          if (next_time < time) {
             next_time = time + SECOND;
             System.out.println(currentSec);
-            System.out.println(p1.getPos());
-
 
             for (Entity entity : level.getEntities()) {
-               if (entity.getClass().equals(Runner.class)) {
-                  if (!((Runner) entity).isRunning()) {
+               if(!entity.getRoom().equals(level.getRoom(0)))
+               {
+                  //IN ENTITY ROOMS
+                  if (entity.getClass().equals(Runner.class)) {
+                     if (!((Runner) entity).isRunning()) {
+                        entity.randomMovementTimer();
+                        if (entity.getRoom().equals(this.level.getCurrentRoom())) {
+                           entity.stareDecrease();
+                        }
+                     }
+                  } else {
                      entity.randomMovementTimer();
                      if (entity.getRoom().equals(this.level.getCurrentRoom())) {
                         entity.stareDecrease();
                      }
                   }
-               } else {
-                  entity.randomMovementTimer();
-                  if (entity.getRoom().equals(this.level.getCurrentRoom())) {
-                     entity.stareDecrease();
+               }
+               else
+               {
+                  //INSIDE END ROOM
+                  if(((RoomHome)entity.getRoom()).ending())
+                  {
+                     game = false;
+                     System.out.println("You died to " + entity.getClass());
                   }
                }
-
             }
 
             currentSec += 1;
@@ -232,21 +196,27 @@ public class VirtualMain extends PApplet
          }
 
 
-
-         for (Entity entity : level.getEntities()) {
-            if (entity.getRoom().equals(this.level.getCurrentRoom())) {
-               if (entity.getClass().equals(InvisibleMan.class)) {
-                  if (!((InvisibleMan) entity).isInvis()) {
-                     image(entity.getImage(), entity.getPos().getX() * TILE_SIZE, entity.getPos().getY() * TILE_SIZE);
+         //PRINTING ENTITY IN CURRENT VIEWED ROOM
+         if(!level.getCurrentRoom().isBlackScreen())
+         {
+            for (Entity entity : level.getEntities()) {
+               if (entity.getRoom().equals(this.level.getCurrentRoom())) {
+                  if(!entity.getRoom().equals(level.getRoom(0)))
+                  {
+                     if (entity.getClass().equals(InvisibleMan.class)) {
+                        if (!((InvisibleMan) entity).isInvis()) {
+                           image(entity.getImage(), entity.getPos().getX() * TILE_SIZE, entity.getPos().getY() * TILE_SIZE);
+                        }
+                     } else {
+                        image(entity.getImage(), entity.getPos().getX() * TILE_SIZE, entity.getPos().getY() * TILE_SIZE);
+                     }
                   }
-               } else {
-                  image(entity.getImage(), entity.getPos().getX() * TILE_SIZE, entity.getPos().getY() * TILE_SIZE);
                }
+               changeWorlds(entity);
             }
-            changeWorlds(entity);
          }
       }
-      else if(game == false)
+      else if(!game)
       {
          //MAIN MENU
          image(menuScreen, 0, 0);
@@ -255,7 +225,6 @@ public class VirtualMain extends PApplet
 
    public boolean changeWorlds(Entity entity)
    {
-      //CHANGE THIS LATER YEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
       if(entity.getRoom().isDoor(entity.getPos()))
       {
          level.nextRoom(entity);

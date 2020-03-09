@@ -7,6 +7,7 @@ public class Level {
     private Entity[] entities;
 
 
+
     public Level(PImage cambreaker, PImage invisibleMan, PImage runner){
         this.rooms = RoomFactory.createRooms();
         this.currentRoom = rooms[0];

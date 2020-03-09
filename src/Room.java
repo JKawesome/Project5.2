@@ -8,6 +8,10 @@ public abstract class Room {
 
     private Point start = new Point(7, 7);
 
+    private boolean blackScreen = false;
+    private final int BLACK_SCREEN_TIME = 5;
+    private int blackScreenTimer = BLACK_SCREEN_TIME;
+
 
     public Room(int numCols,int numRows/*, Entity[] entities*/){
 
@@ -19,6 +23,28 @@ public abstract class Room {
 //            occupancy[p.x][p.y] = entity;
 //        }
         this.background = new int[numCols][numRows];
+    }
+
+    public boolean isBlackScreen()
+    {
+        return blackScreen;
+    }
+
+    public boolean blackScreenTimer()
+    {
+        blackScreenTimer -= 1;
+        if(blackScreenTimer <= 0)
+        {
+            blackScreen = false;
+            blackScreenTimer = BLACK_SCREEN_TIME;
+            return true;
+        }
+        return false;
+    }
+
+    public void setBlackScreen(boolean mode)
+    {
+        blackScreen = mode;
     }
 
     abstract Point getDoor(int i);

@@ -23,7 +23,6 @@ public class Runner extends Entity
 
     public void running()
     {
-        System.out.println("running");
         super.movingToExit();
     }
 
