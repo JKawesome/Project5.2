@@ -138,7 +138,6 @@ public abstract class Entity
     {
         pointIndex = 0;
         int randRoom = rand.nextInt(2);
-        System.out.println(randRoom);
         points = strategy.computePath(pos, room.getDoor(randRoom),
                 p ->  room.withinBounds(p),
                 (p1, p2) -> neighbors(p1,p2),

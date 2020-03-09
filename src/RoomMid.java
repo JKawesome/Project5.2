@@ -2,7 +2,7 @@
 public class RoomMid extends Room {
 
 
-    private Point door1, door2, doorButton, cameraButton;
+    private Point door1, door2;
 
     private final int UPPER_ROOM = 3;
     //MUST CHANGE LOWER ROOM
@@ -10,11 +10,9 @@ public class RoomMid extends Room {
 
 
     public RoomMid(){
-        super(20,15);
-        door1 = new Point(0, 7);
-        door2 = new Point(19, 7);
-        doorButton = new Point(1,6);
-        cameraButton =new Point( 9,1);
+        super(18,14);
+        door1 = new Point(getNumCols()/2, 0);
+        door2 = new Point(getNumRows()/2, 13);
 
         createBackground();
     }
@@ -66,18 +64,16 @@ public class RoomMid extends Room {
 
         for(int x = 0; x< getNumCols(); x++){
             setBackground(x,0, WALL);
-            setBackground(x,14,WALL);
+            setBackground(x,getNumRows()-1,WALL);
         }
 
         for(int y = 0; y< getNumRows(); y++){
             setBackground(0,y, WALL);
-            setBackground(19,y,WALL);
+            setBackground(getNumCols()-1,y,WALL);
         }
 
         setBackground(door1.getX(),door1.getY(),DOOR);
         setBackground(door2.getX(),door2.getY(),DOOR);
-
-        setBackground(cameraButton.getX(),cameraButton.getY(), CAMSCREEN);
 
     }
 

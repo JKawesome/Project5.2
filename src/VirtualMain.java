@@ -5,11 +5,12 @@ import processing.core.*;
 
 public class VirtualMain extends PApplet
 {
+
    //GAMEMODES
    private boolean game = false;
 
    //IMAGES
-   private long next_time = 0;
+   private long next_time;
    private PImage background;
    private PImage obstacle;
    private PImage goal;
@@ -23,7 +24,7 @@ public class VirtualMain extends PApplet
 
    //TIME
    private final int SECOND = 1000;
-   private int currentSec = 0;
+   private int currentSec;
 
 
    //Grid portion
@@ -54,6 +55,8 @@ public class VirtualMain extends PApplet
 
    public void setup()
    {
+      next_time = 0;
+      currentSec = 0;
       goalPos = new Point(14, 13);
 
 
@@ -104,7 +107,7 @@ public class VirtualMain extends PApplet
    private static void initialize_level_grid(GridValues[][] grid) {
       for (int row = 0; row < grid.length; row++) {
          for (int col = 0; col < grid[row].length; col++) {
-            switch (level.getRoom(0).getType(col, row)) {
+            switch (level.getCurrentRoom().getType(col, row)) {
                case Room.WALL:
                   grid[row][col] = GridValues.WALL;
                   break;
@@ -116,6 +119,9 @@ public class VirtualMain extends PApplet
                   break;
                case Room.FLOOR:
                   grid[row][col] = GridValues.FLOOR;
+                  break;
+               default:
+                  grid[row][col] = GridValues.BLACKSCREEN;
                   break;
             }
          }
@@ -142,6 +148,21 @@ public class VirtualMain extends PApplet
 
          draw_grid();
 
+
+         if(level.getCurrentRoom().isBlackScreen())
+         {
+            initialize_black_screen(grid);
+         }
+         else
+         {
+            if(!level.getCurrentRoom().equals(level.getPrevRoom()))
+            {
+               initialize_level_grid(grid);
+               level.setPrevRoom(level.getCurrentRoom());
+            }
+         }
+
+
          //NEED TO CHANGE THIS TO DO WITH THE LIST
          if (((Runner) level.getEntities()[2]).isRunning()) {
             ((Runner) level.getEntities()[2]).running();
@@ -149,7 +170,6 @@ public class VirtualMain extends PApplet
                ((Runner) level.getEntities()[2]).setRunning();
             }
          }
-
 
 
          //EACH SECOND PASSED
@@ -168,7 +188,13 @@ public class VirtualMain extends PApplet
                            entity.stareDecrease();
                         }
                      }
-                  } else {
+                  } else if(entity.getClass().equals(CamBreaker.class) &&
+                          entity.getRoom().isBlackScreen())
+                  {
+                     ((CamBreaker)entity).blackScreenTimer();
+                  }
+                  else
+                  {
                      entity.randomMovementTimer();
                      if (entity.getRoom().equals(this.level.getCurrentRoom())) {
                         entity.stareDecrease();
@@ -181,6 +207,7 @@ public class VirtualMain extends PApplet
                   if(((RoomHome)entity.getRoom()).ending())
                   {
                      game = false;
+                     setup();
                      System.out.println("You died to " + entity.getClass());
                   }
                }

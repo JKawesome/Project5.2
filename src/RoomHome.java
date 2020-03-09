@@ -11,11 +11,11 @@ public class RoomHome extends Room {
     private Random rand = new Random();
 
     public RoomHome(){
-        super(20,15);
-        door1 = new Point(0, 7);
-        door2 = new Point(19, 7);
-        doorButton = new Point(1,6);
-        cameraButton =new Point( 9,1);
+        super(10,10);
+        door1 = new Point(0, 5);
+        door2 = new Point(getNumCols()-1, 5);
+        doorButton = new Point(1,4);
+        cameraButton =new Point( 4,1);
 
         createBackground();
     }
@@ -76,12 +76,12 @@ public class RoomHome extends Room {
 
         for(int x = 0; x< getNumCols(); x++){
             setBackground(x,0, WALL);
-            setBackground(x,14,WALL);
+            setBackground(x,getNumRows()-1,WALL);
         }
 
         for(int y = 0; y< getNumRows(); y++){
             setBackground(0,y, WALL);
-            setBackground(19,y,WALL);
+            setBackground(getNumCols()-1,y,WALL);
         }
 
         setBackground(door1.getX(),door1.getY(),DOOR);
