@@ -33,4 +33,9 @@ public class InvisibleMan extends Entity
             invisTimer = INVIS_TIME;
         }
     }
+
+    public String toString()
+    {
+        return "Invisible Man";
+    }
 }

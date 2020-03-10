@@ -186,4 +186,6 @@ public abstract class Entity
                 p1.getX() == p2.getX() && p1.getY()+1 == p2.getY() ||
                 p1.getX() == p2.getX() && p1.getY()-1 == p2.getY();
     }
+
+    public abstract String toString();
 }

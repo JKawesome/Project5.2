@@ -32,4 +32,9 @@ public class Runner extends Entity
         super.createPath();
         super.resetTimers();
     }
+
+    public String toString()
+    {
+        return "Runner";
+    }
 }

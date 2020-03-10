@@ -29,5 +29,10 @@ public class CamBreaker extends Entity
         }
         return false;
     }
+
+    public String toString()
+    {
+        return "Camera Breaker";
+    }
 }
 

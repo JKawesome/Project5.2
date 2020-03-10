@@ -10,12 +10,17 @@ public class VirtualMain extends PApplet
    //GAMEMODES
    private boolean game = false;
 
+   //time position
+   private final int TIME_POSX = 545;
+   private final int TIME_POSY = 17;
+
    //IMAGES
    private long next_time;
    private PImage background;
    private PImage obstacle;
    private PImage goal;
    private PImage blackScreen;
+   private PImage whiteScreen;
    private PImage menuScreen;
 
    private PImage camBreaker;
@@ -30,7 +35,7 @@ public class VirtualMain extends PApplet
 
    //Grid portion
    private static final int TILE_SIZE = 32;
-   public static enum GridValues { BACKGROUND, OBSTACLE, GOAL, BLACKSCREEN, WALL, FLOOR, DOOR, CAMSCREEN};
+   public static enum GridValues { BACKGROUND, OBSTACLE, GOAL, BLACKSCREEN, WALL, FLOOR, DOOR, CAMSCREEN, WHITESCREEN};
    private GridValues[][] grid;
    private static final int ROWS = 15;
    private static final int COLS = 20;
@@ -44,8 +49,21 @@ public class VirtualMain extends PApplet
 
 
    //for now creating player
-   Player p1;
+   private Player p1;
 
+
+   //for explosion
+   private List<PImage> explosionImages;
+   private int currMouseX;
+   private int currMouseY;
+   private boolean explosion = false;
+   private int explosionIndex = 0;
+
+
+   //for ENERGYBAR
+   private List<PImage> energyBar;
+   private final int EXPLOSION_ENERGY = 5;
+   private final int CAMERA_ENERGY = 1;
 
    private Point goalPos;
 
@@ -79,6 +97,7 @@ public class VirtualMain extends PApplet
       obstacle = loadImage("images/vein.bmp");
       goal = loadImage("images/water.bmp");
       blackScreen = loadImage("images/blackScreen.bmp");
+      whiteScreen = loadImage("images/whiteScreen.bmp");
       menuScreen = loadImage("images/menuScreen.png");
 
 
@@ -87,6 +106,28 @@ public class VirtualMain extends PApplet
       floor = goal; //loadImage("images/skull_floor_tile.png");
       door = blackScreen;//loadImage("images/camera_screen_icon.gif");
       camScreen = background;//loadImage("images/camera_screen_icon.gif");
+
+      //all the explosions
+      explosionImages = new ArrayList<>();
+      explosionImages.add(loadImage("images/e1.png"));
+      explosionImages.add(loadImage("images/e2.png"));
+      explosionImages.add(loadImage("images/e3.png"));
+      explosionImages.add(loadImage("images/e4.png"));
+      explosionImages.add(loadImage("images/e5.png"));
+      explosionImages.add(loadImage("images/e6.png"));
+      explosionImages.add(loadImage("images/e7.png"));
+      explosionImages.add(loadImage("images/e8.png"));
+      explosionImages.add(loadImage("images/e9.png"));
+      explosionImages.add(loadImage("images/e10.png"));
+
+      //ENERGY BAR
+      energyBar = new ArrayList<>();
+      energyBar.add(loadImage("images/Energy1.png"));
+      energyBar.add(loadImage("images/Energy2.png"));
+      energyBar.add(loadImage("images/Energy3.png"));
+      energyBar.add(loadImage("images/Energy4.png"));
+      energyBar.add(loadImage("images/Energy5.png"));
+
 
       level = new Level(camBreaker, invisibleMan, runner);
       grid = new GridValues[ROWS][COLS];
@@ -146,9 +187,23 @@ public class VirtualMain extends PApplet
       if(game) {
          long time = System.currentTimeMillis();
 
-
          draw_grid();
+         text("Time: " + currentSec, TIME_POSX, TIME_POSY);
 
+
+         image(energyBar.get(level.getEnergyIndex()),
+                 level.getEnergyLocation().getX(), level.getEnergyLocation().getY());
+
+         if(explosion)
+         {
+            image(explosionImages.get(explosionIndex), currMouseX, currMouseY);
+            explosionIndex += 1;
+            if(explosionIndex >= explosionImages.size())
+            {
+               explosion = false;
+               explosionIndex = 0;
+            }
+         }
 
          if(level.getCurrentRoom().isBlackScreen())
          {
@@ -173,6 +228,17 @@ public class VirtualMain extends PApplet
          if (next_time < time) {
             next_time = time + SECOND;
             System.out.println(currentSec);
+
+            //if in entity room, decrease cam timer
+            if(!level.getCurrentRoom().equals(level.getRoom(0)))
+            {
+               if(level.decreaseEnergy(CAMERA_ENERGY))
+               {
+                  game = false;
+                  setup();
+                  System.out.println("You died to lack of energy");
+               }
+            }
 
             for (Entity entity : level.getEntities()) {
                if(!entity.getRoom().equals(level.getRoom(0)))
@@ -225,15 +291,12 @@ public class VirtualMain extends PApplet
          {
             for (Entity entity : level.getEntities()) {
                if (entity.getRoom().equals(this.level.getCurrentRoom())) {
-                  if(!entity.getRoom().equals(level.getRoom(0)))
-                  {
-                     if (entity.getClass().equals(InvisibleMan.class)) {
-                        if (!((InvisibleMan) entity).isInvis()) {
-                           image(entity.getImage(), entity.getPos().getX() * TILE_SIZE, entity.getPos().getY() * TILE_SIZE);
-                        }
-                     } else {
+                  if (entity.getClass().equals(InvisibleMan.class)) {
+                     if (!((InvisibleMan) entity).isInvis()) {
                         image(entity.getImage(), entity.getPos().getX() * TILE_SIZE, entity.getPos().getY() * TILE_SIZE);
                      }
+                  } else {
+                     image(entity.getImage(), entity.getPos().getX() * TILE_SIZE, entity.getPos().getY() * TILE_SIZE);
                   }
                }
                changeWorlds(entity);
@@ -302,6 +365,10 @@ public class VirtualMain extends PApplet
          case CAMSCREEN:
             image(camScreen, col * TILE_SIZE, row * TILE_SIZE);
             break;
+            //FOR EXPLOSION
+         case WHITESCREEN:
+            image(whiteScreen, col * TILE_SIZE, row * TILE_SIZE);
+            break;
       }
    }
 
@@ -319,21 +386,7 @@ public class VirtualMain extends PApplet
       }
       if(level.getCurrentRoom().equals(level.getRoom(0)))
       {
-         if(key == ' ' && ((RoomHome)p1.getRoom()).getDoorButton().equals(p1.getPos()))
-         {
-            ((RoomHome)level.getCurrentRoom()).leftEnd();
-            for(Entity entity : level.getEntities())
-            {
-               if(entity.getRoom().equals(level.getCurrentRoom()))
-               {
-                  Random rand = new Random();
-                  int randRoom = rand.nextInt(2) + 1;
-                  entity.setRoom(level.getRoom(randRoom));
-                  System.out.println(entity + "got kicked out");
-               }
-            }
-         }
-         else if(key == ' ' && ((RoomHome)p1.getRoom()).getCameraButton().equals(p1.getPos()))
+         if(key == ' ' && ((RoomHome)p1.getRoom()).getCameraButton().equals(p1.getPos()))
          {
             level.setRoom(1);
          }
@@ -360,6 +413,42 @@ public class VirtualMain extends PApplet
          {
             level.setRoom(level.getClickedRoom(pressed));
          }
+
+
+         if(level.getCurrentRoom().equals(level.getRoom(0)))
+         {
+            if(((RoomHome)p1.getRoom()).getDoorButton().equals(p1.getPos()))
+            {
+               //creates explosion
+               explosion = true;
+               currMouseX = mouseX- 2*TILE_SIZE + TILE_SIZE/2;
+               currMouseY = mouseY- 2*TILE_SIZE + TILE_SIZE/2;
+
+               if(level.decreaseEnergy(EXPLOSION_ENERGY))
+               {
+                  game = false;
+                  setup();
+                  System.out.println("You died to lack of energy");
+               }
+
+               //suppose to create white spots and despawns entity
+               for(Entity entity : level.getEntities())
+               {
+                  if(entity.getRoom().equals(level.getCurrentRoom()))
+                  {
+                     if(entity.getPos().equals(pressed))
+                     {
+                        drawWhiteSpot(entity.getPos());
+                        Random rand = new Random();
+                        int randRoom = rand.nextInt(2) + 1;
+                        entity.setRoom(level.getRoom(randRoom));
+                        System.out.println(entity + " got kicked out");
+                        ((RoomHome)level.getCurrentRoom()).leftEnd();
+                     }
+                  }
+               }
+            }
+         }
       }
       else
       {
@@ -383,5 +472,18 @@ public class VirtualMain extends PApplet
    private Point mouseToPoint(int x, int y)
    {
       return new Point(mouseX/TILE_SIZE, mouseY/TILE_SIZE);
+   }
+
+
+   private void drawWhiteSpot(Point p)
+   {
+      for (int row = Math.max(0, p.getX() - 1); row < Math.min(grid.length, p.getX()); row++)
+      {
+         for (int col = Math.max(0, p.getY()); col < Math.min(grid[row].length, p.getY()); col++)
+         {
+            //FIX THIS
+            level.getCurrentRoom().setBackground(row, col, Room.WHITESCREEN);
+         }
+      }
    }
 }

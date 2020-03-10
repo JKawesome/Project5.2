@@ -115,4 +115,18 @@ public class RoomHome extends Room {
     }
 
 
+    public Point getStart()
+    {
+        Point newStart;
+        while(true)
+        {
+            newStart = new Point(rand.nextInt(super.getNumCols()),
+                    rand.nextInt(super.getNumRows()));
+            if(super.withinBounds(newStart))
+            {
+                return newStart;
+            }
+        }
+    }
+
 }

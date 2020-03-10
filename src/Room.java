@@ -4,7 +4,7 @@ public abstract class Room {
     private int numCols;
    // private Entity occupancy[][];
     private int[][] background; //value for which background image to draw
-    public static final int WALL = 1, FLOOR = 2, DOOR = 3, CAMSCREEN = 4;
+    public static final int WALL = 1, FLOOR = 2, DOOR = 3, CAMSCREEN = 4, WHITESCREEN = 5;
 
     private Point start;
 
@@ -16,11 +16,6 @@ public abstract class Room {
 
         this.numCols = numCols;
         this.numRows = numRows;
-        //this.occupancy = new Entity[numCols][numRows];
-//        for(Entity entity:entities){
-//            Point p = entity.getPosition();
-//            occupancy[p.x][p.y] = entity;
-//        }
         this.background = new int[numCols][numRows];
         start = new Point(numCols/2,numRows/2);
     }
