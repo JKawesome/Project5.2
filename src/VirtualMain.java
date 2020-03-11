@@ -23,6 +23,8 @@ public class VirtualMain extends PApplet
    private PImage whiteScreen;
    private PImage menuScreen;
 
+   private PImage bombing;
+
    private PImage camBreaker;
    private PImage invisibleMan;
    private PImage runner;
@@ -35,7 +37,10 @@ public class VirtualMain extends PApplet
 
    //Grid portion
    private static final int TILE_SIZE = 32;
-   public static enum GridValues { BACKGROUND, OBSTACLE, GOAL, BLACKSCREEN, WALL, FLOOR, DOOR, CAMSCREEN, WHITESCREEN};
+   private ArrayList<Object> wallColors;
+
+
+   public static enum GridValues { BACKGROUND, OBSTACLE, GOAL, BLACKSCREEN, WALL, FLOOR, DOOR, CAMSCREEN, WALLCOLOR, BOMBING, WHITESCREEN};
    private GridValues[][] grid;
    private static final int ROWS = 15;
    private static final int COLS = 20;
@@ -92,6 +97,8 @@ public class VirtualMain extends PApplet
       runner = loadImage("images/Runner1.png");
 
 
+      bombing = loadImage("images/BulletRedsmall.png");
+
 
       background = loadImage("images/grass.bmp");
       obstacle = loadImage("images/vein.bmp");
@@ -119,6 +126,16 @@ public class VirtualMain extends PApplet
       explosionImages.add(loadImage("images/e8.png"));
       explosionImages.add(loadImage("images/e9.png"));
       explosionImages.add(loadImage("images/e10.png"));
+
+      wallColors = new ArrayList<>();
+      wallColors.add(loadImage("images/c1.png"));
+      wallColors.add(loadImage("images/c2.png"));
+      wallColors.add(loadImage("images/c3.png"));
+      wallColors.add(loadImage("images/c4.png"));
+      wallColors.add(loadImage("images/c5.png"));
+      wallColors.add(loadImage("images/c6.png"));
+      wallColors.add(loadImage("images/c7.png"));
+      wallColors.add(loadImage("images/c8.png"));
 
       //ENERGY BAR
       energyBar = new ArrayList<>();
@@ -163,6 +180,12 @@ public class VirtualMain extends PApplet
                   break;
                case Room.FLOOR:
                   grid[row][col] = GridValues.FLOOR;
+                  break;
+               case Room.WALLCOLOR:
+                  grid[row][col] = GridValues.WALLCOLOR;
+                  break;
+               case Room.BOMBING:
+                  grid[row][col] = GridValues.BOMBING;
                   break;
                default:
                   grid[row][col] = GridValues.BLACKSCREEN;
@@ -367,10 +390,16 @@ public class VirtualMain extends PApplet
          case CAMSCREEN:
             image(camScreen, col * TILE_SIZE, row * TILE_SIZE);
             break;
+         case BOMBING:
+            image(bombing, col  * TILE_SIZE, row * TILE_SIZE);
+            break;
             //FOR EXPLOSION
          case WHITESCREEN:
             image(whiteScreen, col * TILE_SIZE, row * TILE_SIZE);
             break;
+         case WALLCOLOR:
+            image((PImage) wallColors.get(((RoomHome)level.getRoom(0)).getColor(row,col)),col * TILE_SIZE, row * TILE_SIZE);
+
       }
    }
 
@@ -445,7 +474,13 @@ public class VirtualMain extends PApplet
                         int randRoom = rand.nextInt(2) + 1;
                         entity.setRoom(level.getRoom(randRoom));
                         System.out.println(entity + " got kicked out");
-                        //todo - end display of entity location.
+
+                        Point[] colorLocs = ((RoomHome) level.getRoom(0)).explosionOfColors(pressed);
+
+                        for(Point  p:colorLocs){
+                           level.getRoom(0).setBackground(p.getX(),p.getY(), Room.WALLCOLOR);
+                        }
+
                         ((RoomHome)level.getCurrentRoom()).leftEnd();
                      }
                   }

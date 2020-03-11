@@ -1,11 +1,14 @@
 import java.util.Arrays;
-import java.util.List;
 import java.util.Random;
 
 public class RoomHome extends Room {
 
 
     private Point door1, door2, doorButton, cameraButton;
+
+    private int[][] wallColors = new int[20][15];
+
+
     
     private Point[] entitySpots = new Point[]{new Point(15, 3), new Point(17,10), new Point( 5, 12)};
 
@@ -20,6 +23,7 @@ public class RoomHome extends Room {
         door2 = new Point(getNumCols()-1, 5);
         doorButton = new Point(1,4);
         cameraButton =new Point( 4,1);
+
 
         createBackground();
     }
@@ -105,11 +109,15 @@ public class RoomHome extends Room {
         }
 
         for(Point p: entitySpots) {
-           setBackground(p.getX(), p.getY(), FLOOR);
+            setBackground(p.getX(), p.getY(), FLOOR);
             setBackground(p.getX(), p.getY()-1, WALL);
             setBackground(p.getX()-1, p.getY(), WALL);
             setBackground(p.getX(), p.getY()+1, WALL);
             setBackground(p.getX()+1, p.getY(), WALL);
+            setBackground(p.getX()-1, p.getY()-1, WALL);
+            setBackground(p.getX()-1, p.getY()+1, WALL);
+            setBackground(p.getX()+1, p.getY()+1, WALL);
+            setBackground(p.getX()+1, p.getY()-1, WALL);
         }
 
         setBackground(door1.getX(),door1.getY(),DOOR);
@@ -117,10 +125,39 @@ public class RoomHome extends Room {
 
         setBackground(cameraButton.getX(),cameraButton.getY(), CAMSCREEN);
 
+        setBackground(doorButton.getX(),doorButton.getY(),BOMBING);
+
     }
 
-    public void showMonsterLocations(){
+    public Point[] explosionOfColors(Point location){
+        Point[] points = new Point[8];
+        for(Point p: entitySpots) {
+            if(p.equals(location)) {
+                points[0] = new Point(p.getX(), p.getY() - 1);
+                points[1] = new Point(p.getX() - 1, p.getY());
+                points[2] = new Point(p.getX(), p.getY() + 1);
+                points[3] = new Point(p.getX() + 1, p.getY());
+                points[4] = new Point(p.getX() - 1, p.getY() - 1);
+                points[5] = new Point(p.getX() - 1, p.getY() + 1);
+                points[6] = new Point(p.getX() + 1, p.getY() + 1);
+                points[7] = new Point(p.getX() + 1, p.getY() - 1);
+                break;
+            }
 
+        }
+
+        return points;
+//        for(Point p: entitySpots) {
+//            setBackground(p.getX(), p.getY(), FLOOR);
+//            setBackground(p.getX(), p.getY()-1, WALL);
+//            setBackground(p.getX()-1, p.getY(), WALL);
+//            setBackground(p.getX(), p.getY()+1, WALL);
+//            setBackground(p.getX()+1, p.getY(), WALL);
+//            setBackground(p.getX()-1, p.getY()-1, WALL);
+//            setBackground(p.getX()-1, p.getY()+1, WALL);
+//            setBackground(p.getX()+1, p.getY()+1, WALL);
+//            setBackground(p.getX()+1, p.getY()-1, WALL);
+//        }
     }
 
     public void hideMonsterLocations(){
@@ -142,6 +179,17 @@ public class RoomHome extends Room {
         return newStart;
     }
 
+    public int getColor(int row, int col) {
+        if(wallColors[col][row] == 0){
+            wallColors[col][row] = rand.nextInt(8)+1;
+        }
+        return wallColors[col][row];
+    }
 
 
+//    public void bombedSpot(Point p) {
+//        if(p.equals(entitySpots[0])){
+//
+//        }
+//    }
 }

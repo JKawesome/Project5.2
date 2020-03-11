@@ -1,10 +1,12 @@
 public abstract class Room {
 
+
+
     private int numRows;
     private int numCols;
    // private Entity occupancy[][];
     private int[][] background; //value for which background image to draw
-    public static final int WALL = 1, FLOOR = 2, DOOR = 3, CAMSCREEN = 4, WHITESCREEN = 5;
+    public static final int WALL = 1, FLOOR = 2, DOOR = 3, CAMSCREEN = 4, WHITESCREEN = 5, WALLCOLOR = 6, BOMBING =7;
 
     private Point start;
 
