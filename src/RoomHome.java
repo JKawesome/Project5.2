@@ -141,8 +141,12 @@ public class RoomHome extends Room {
                 points[5] = new Point(p.getX() - 1, p.getY() + 1);
                 points[6] = new Point(p.getX() + 1, p.getY() + 1);
                 points[7] = new Point(p.getX() + 1, p.getY() - 1);
+                for(Point pSub: points) if(wallColors[p.getX()][p.getY()] == 0){
+                    wallColors[p.getX()][p.getY()] = 0;
+                }
                 break;
             }
+
 
         }
 

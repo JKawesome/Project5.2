@@ -398,7 +398,7 @@ public class VirtualMain extends PApplet
             image(whiteScreen, col * TILE_SIZE, row * TILE_SIZE);
             break;
          case WALLCOLOR:
-            image((PImage) wallColors.get(((RoomHome)level.getRoom(0)).getColor(row,col)),col * TILE_SIZE, row * TILE_SIZE);
+            image((PImage) wallColors.get(((RoomHome)level.getRoom(0)).getColor(row,col)-1),col * TILE_SIZE, row * TILE_SIZE);
 
       }
    }
@@ -473,7 +473,11 @@ public class VirtualMain extends PApplet
                         Random rand = new Random();
                         int randRoom = rand.nextInt(2) + 1;
                         entity.setRoom(level.getRoom(randRoom));
+                        entity.setMoving(true);
+                        entity.makeBoxed();
                         System.out.println(entity + " got kicked out");
+
+
 
                         Point[] colorLocs = ((RoomHome) level.getRoom(0)).explosionOfColors(pressed);
 

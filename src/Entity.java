@@ -27,10 +27,12 @@ public abstract class Entity
     //pathing
     private PathingStrategy strategy = new AStarPathingStrategy();
     private PathingStrategy strategy2 = new DijkstraPathing();
+    private PathingStrategy boxStrat = new BoxPath();
     private List<PathingStrategy> strats = Arrays.asList(strategy, strategy2);
 
     private List<Point> points;
     private int pointIndex = 0;
+    private boolean box;
 
 
     public Entity(Point pos, Room room, PImage image)
@@ -38,6 +40,7 @@ public abstract class Entity
         this.pos = pos;
         this.room = room;
         this.image = image;
+        box = false;
     }
 
     public PImage getImage()
@@ -54,6 +57,7 @@ public abstract class Entity
     public void setRoom(Room room)
     {
         this.room = room;
+        pos = this.room.getStart();
     }
 
     public Point getPos()
@@ -91,7 +95,7 @@ public abstract class Entity
                 ((InvisibleMan)this).invisibleTime();
             }
         }
-        if(moving == false)
+        if(!moving)
         {
             randMoveTimer -= 1;
             if(randMoveTimer <= 0)
@@ -133,7 +137,13 @@ public abstract class Entity
         }
         else
         {
-            moving = false;
+            if(box){
+                createPath();
+                box = false;
+            }
+            else {
+                moving = false;
+            }
         }
     }
 
@@ -144,10 +154,19 @@ public abstract class Entity
         int randRoom = rand.nextInt(2);
         int randStrat = rand.nextInt(2);
 
-        points = strats.get(1).computePath(pos, room.getDoor(randRoom),
-                p ->  room.withinBounds(p),
-                (p1, p2) -> neighbors(p1,p2),
-                PathingStrategy.CARDINAL_NEIGHBORS);
+        if(box){
+            points = boxStrat.computePath(pos, room.getDoor(randRoom),
+                    p ->  room.withinBounds(p),
+                    (p1, p2) -> neighbors(p1,p2),
+                    PathingStrategy.CARDINAL_NEIGHBORS);
+
+        }
+        else {
+            points = strats.get(1).computePath(pos, room.getDoor(randRoom),
+                    p -> room.withinBounds(p),
+                    (p1, p2) -> neighbors(p1, p2),
+                    PathingStrategy.CARDINAL_NEIGHBORS);
+        }
     }
 
 
@@ -194,4 +213,12 @@ public abstract class Entity
     }
 
     public abstract String toString();
+
+    public void makeBoxed() {
+        box = true;
+    }
+
+    public void setMoving(boolean b) {
+        moving = b;
+    }
 }
