@@ -97,6 +97,4 @@ public class RoomFar extends Room {
         if(p== door2) return 2;
         else return 0;
     }
-
-
 }

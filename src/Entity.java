@@ -1,5 +1,6 @@
 import processing.core.PImage;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -25,6 +26,9 @@ public abstract class Entity
 
     //pathing
     private PathingStrategy strategy = new AStarPathingStrategy();
+    private PathingStrategy strategy2 = new DijkstraPathing();
+    private List<PathingStrategy> strats = Arrays.asList(strategy, strategy2);
+
     private List<Point> points;
     private int pointIndex = 0;
 
@@ -138,7 +142,9 @@ public abstract class Entity
     {
         pointIndex = 0;
         int randRoom = rand.nextInt(2);
-        points = strategy.computePath(pos, room.getDoor(randRoom),
+        int randStrat = rand.nextInt(2);
+
+        points = strats.get(randStrat).computePath(pos, room.getDoor(randRoom),
                 p ->  room.withinBounds(p),
                 (p1, p2) -> neighbors(p1,p2),
                 PathingStrategy.CARDINAL_NEIGHBORS);

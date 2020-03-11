@@ -1,9 +1,16 @@
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 public class RoomHome extends Room {
 
 
     private Point door1, door2, doorButton, cameraButton;
+
+    private final Point entitySpot1 = new Point(470, 95);
+    private final Point entitySpot2 = new Point(470, 235);
+    private final Point entitySpot3 = new Point(470, 375);
+    private List<Point> entitySpots = Arrays.asList(entitySpot1, entitySpot2, entitySpot3);
 
     private final int END_TIME = 10;
     private int endTimer = END_TIME;
@@ -117,16 +124,9 @@ public class RoomHome extends Room {
 
     public Point getStart()
     {
-        Point newStart;
-        while(true)
-        {
-            newStart = new Point(rand.nextInt(super.getNumCols()),
-                    rand.nextInt(super.getNumRows()));
-            if(super.withinBounds(newStart))
-            {
-                return newStart;
-            }
-        }
+        //MOVING ENTITY TO SOME RANDOM SPOT
+        Point newStart = entitySpots.get(rand.nextInt(entitySpots.size()));
+        return newStart;
     }
 
 }
