@@ -66,7 +66,7 @@ class DijkstraPathing
         DNode finishedPath = closed.get(end);
         if(finishedPath != null)
         {
-            if(withinReach.test(finishedPath.getPrevNode().getPos(), end))
+            if(finishedPath.getPrevNode() != null && withinReach.test(finishedPath.getPrevNode().getPos(), end))
             {
                 while(finishedPath != null && !finishedPath.equals(closed.get(start)))
                 {

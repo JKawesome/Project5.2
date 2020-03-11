@@ -6,11 +6,8 @@ public class RoomHome extends Room {
 
 
     private Point door1, door2, doorButton, cameraButton;
-
-    private final Point entitySpot1 = new Point(470, 95);
-    private final Point entitySpot2 = new Point(470, 235);
-    private final Point entitySpot3 = new Point(470, 375);
-    private List<Point> entitySpots = Arrays.asList(entitySpot1, entitySpot2, entitySpot3);
+    
+    private Point[] entitySpots = new Point[]{new Point(15, 3), new Point(17,10), new Point( 5, 12)};
 
     private final int END_TIME = 10;
     private int endTimer = END_TIME;
@@ -107,11 +104,27 @@ public class RoomHome extends Room {
             setBackground(getNumCols()-1,y,WALL);
         }
 
+        for(Point p: entitySpots) {
+           setBackground(p.getX(), p.getY(), FLOOR);
+            setBackground(p.getX(), p.getY()-1, WALL);
+            setBackground(p.getX()-1, p.getY(), WALL);
+            setBackground(p.getX(), p.getY()+1, WALL);
+            setBackground(p.getX()+1, p.getY(), WALL);
+        }
+
         setBackground(door1.getX(),door1.getY(),DOOR);
         setBackground(door2.getX(),door2.getY(),DOOR);
 
         setBackground(cameraButton.getX(),cameraButton.getY(), CAMSCREEN);
 
+    }
+
+    public void showMonsterLocations(){
+
+    }
+
+    public void hideMonsterLocations(){
+        createBackground();
     }
 
     @Override
@@ -125,8 +138,10 @@ public class RoomHome extends Room {
     public Point getStart()
     {
         //MOVING ENTITY TO SOME RANDOM SPOT
-        Point newStart = entitySpots.get(rand.nextInt(entitySpots.size()));
+        Point newStart = entitySpots[rand.nextInt(entitySpots.length)];
         return newStart;
     }
+
+
 
 }

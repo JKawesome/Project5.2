@@ -16,7 +16,7 @@ public abstract class Room {
 
         this.numCols = numCols;
         this.numRows = numRows;
-        this.background = new int[numCols][numRows];
+        this.background = new int[20][15];
         start = new Point(numCols/2,numRows/2);
     }
 

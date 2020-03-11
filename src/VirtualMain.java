@@ -146,6 +146,8 @@ public class VirtualMain extends PApplet
    }
 
 
+
+
    private static void initialize_level_grid(GridValues[][] grid) {
       for (int row = 0; row < grid.length; row++) {
          for (int col = 0; col < grid[row].length; col++) {
@@ -287,7 +289,7 @@ public class VirtualMain extends PApplet
 
 
          //PRINTING ENTITY IN CURRENT VIEWED ROOM
-         if(!level.getCurrentRoom().isBlackScreen())
+         if(!level.getCurrentRoom().isBlackScreen() && !level.getCurrentRoom().equals(level.getRoom(0)))
          {
             for (Entity entity : level.getEntities()) {
                if (entity.getRoom().equals(this.level.getCurrentRoom())) {
@@ -443,6 +445,7 @@ public class VirtualMain extends PApplet
                         int randRoom = rand.nextInt(2) + 1;
                         entity.setRoom(level.getRoom(randRoom));
                         System.out.println(entity + " got kicked out");
+                        //todo - end display of entity location.
                         ((RoomHome)level.getCurrentRoom()).leftEnd();
                      }
                   }

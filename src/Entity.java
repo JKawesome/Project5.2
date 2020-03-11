@@ -144,7 +144,7 @@ public abstract class Entity
         int randRoom = rand.nextInt(2);
         int randStrat = rand.nextInt(2);
 
-        points = strats.get(randStrat).computePath(pos, room.getDoor(randRoom),
+        points = strats.get(1).computePath(pos, room.getDoor(randRoom),
                 p ->  room.withinBounds(p),
                 (p1, p2) -> neighbors(p1,p2),
                 PathingStrategy.CARDINAL_NEIGHBORS);
