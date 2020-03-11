@@ -102,10 +102,10 @@ public class VirtualMain extends PApplet
 
 
       //for each room
-      wall = obstacle;//loadImage("images/wall_tile.png");//Room.getFilenameOfType(Room.WALL));
-      floor = goal; //loadImage("images/skull_floor_tile.png");
-      door = blackScreen;//loadImage("images/camera_screen_icon.gif");
-      camScreen = background;//loadImage("images/camera_screen_icon.gif");
+      wall = loadImage("images/wall_tile.png");//Room.getFilenameOfType(Room.WALL));
+      floor = loadImage("images/skull_floor_tiles.png");
+      door = loadImage("images/castledoors.png");
+      camScreen = loadImage("images/camera_screen_icon.png");
 
       //all the explosions
       explosionImages = new ArrayList<>();
