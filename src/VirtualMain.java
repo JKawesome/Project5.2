@@ -262,7 +262,6 @@ public class VirtualMain extends PApplet
          //EACH SECOND PASSED
          if (next_time < time) {
             next_time = time + SECOND;
-            System.out.println(currentSec);
 
             //timer for kicked entity text countdown
             if(kickedEntityTimer >= 0)
@@ -278,7 +277,6 @@ public class VirtualMain extends PApplet
                {
                   game = false;
                   setup();
-                  //System.out.println("You died to lack of energy");
                   death = "lack of energy!";
                }
             }
@@ -472,7 +470,6 @@ public class VirtualMain extends PApplet
 
    public void mousePressed()
    {
-//      System.out.println(mouseX + " " + mouseY);
       if(game)
       {
          Point pressed = mouseToPoint(mouseX, mouseY);
@@ -497,7 +494,6 @@ public class VirtualMain extends PApplet
                   game = false;
                   setup();
                   death = "lack of energy!";
-                  //System.out.println("You died to lack of energy");
                }
 
                //suppose to create white spots and despawns entity
@@ -513,8 +509,6 @@ public class VirtualMain extends PApplet
                         entity.setRoom(level.getRoom(randRoom));
                         entity.setMoving(true);
                         entity.makeBoxed();
-                        //System.out.println(entity + " got kicked out");
-                        //NNEEEED TO PRINT THISSSSSSSSSSSSS
 
                         kickedEntityTimer = KICKED_TIME;
                         kickedEntity = entity.toString();
@@ -536,7 +530,6 @@ public class VirtualMain extends PApplet
       }
       else
       {
-         //System.out.println(mouseX + ", " + mouseY);
          if(mouseX >= 37 && mouseX <= 600 &&
             mouseY >= 37 && mouseY <= 180)
          {
@@ -545,7 +538,7 @@ public class VirtualMain extends PApplet
          else if(mouseX >= 37 && mouseX <= 600 &&
                  mouseY >= 275 && mouseY <= 415)
          {
-            System.out.println("Exit");
+            exit();
          }
       }
 
