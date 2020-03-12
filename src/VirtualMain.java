@@ -33,6 +33,7 @@ public class VirtualMain extends PApplet
    //TIME
    private final int SECOND = 1000;
    private int currentSec;
+   private int finalSec;
 
 
    //Grid portion
@@ -72,6 +73,13 @@ public class VirtualMain extends PApplet
 
    private Point goalPos;
 
+   private String death;
+
+   private String kickedEntity;
+   private final Point KICKED_TEXT_POINT = new Point(330, 385);
+   private final int KICKED_TIME = 4;
+   private int kickedEntityTimer;
+
    public void settings()
    {
       size(640, 480);
@@ -79,6 +87,8 @@ public class VirtualMain extends PApplet
 
    public void setup()
    {
+      death = null;
+      kickedEntityTimer = 0;
       next_time = 0;
       currentSec = 0;
       goalPos = new Point(14, 13);
@@ -213,6 +223,7 @@ public class VirtualMain extends PApplet
          long time = System.currentTimeMillis();
 
          draw_grid();
+         fill(255);
          text("Time: " + currentSec, TIME_POSX, TIME_POSY);
 
 
@@ -240,7 +251,6 @@ public class VirtualMain extends PApplet
          }
 
 
-         //NEED TO CHANGE THIS TO DO WITH THE LIST
          if (((Runner) level.getEntities()[2]).isRunning()) {
             ((Runner) level.getEntities()[2]).running();
             if (changeWorlds(((Runner) level.getEntities()[2]))) {
@@ -254,6 +264,13 @@ public class VirtualMain extends PApplet
             next_time = time + SECOND;
             System.out.println(currentSec);
 
+            //timer for kicked entity text countdown
+            if(kickedEntityTimer >= 0)
+            {
+               kickedEntityTimer -= 1;
+            }
+
+
             //if in entity room, decrease cam timer
             if(!level.getCurrentRoom().equals(level.getRoom(0)))
             {
@@ -261,9 +278,11 @@ public class VirtualMain extends PApplet
                {
                   game = false;
                   setup();
-                  System.out.println("You died to lack of energy");
+                  //System.out.println("You died to lack of energy");
+                  death = "lack of energy!";
                }
             }
+
 
             for (Entity entity : level.getEntities()) {
                if(!entity.getRoom().equals(level.getRoom(0)))
@@ -296,12 +315,13 @@ public class VirtualMain extends PApplet
                   {
                      game = false;
                      setup();
-                     System.out.println("You died to " + entity.getClass());
+                     death = entity.toString();
                   }
                }
             }
 
             currentSec += 1;
+            finalSec = currentSec;
          }
 
          //printing player
@@ -327,11 +347,26 @@ public class VirtualMain extends PApplet
                changeWorlds(entity);
             }
          }
+         else
+         {
+            if(kickedEntityTimer > 0)
+            {
+               text(kickedEntity + " got kicked out!", KICKED_TEXT_POINT.getX(), KICKED_TEXT_POINT.getY());
+            }
+         }
       }
       else if(!game)
       {
          //MAIN MENU
+
          image(menuScreen, 0, 0);
+         if(death != null)
+         {
+            fill(0);
+
+            text("You have died to " + death, 250, 220);
+            text("You lasted for " + finalSec + " seconds!", 250, 240);
+         }
       }
    }
 
@@ -398,7 +433,8 @@ public class VirtualMain extends PApplet
             image(whiteScreen, col * TILE_SIZE, row * TILE_SIZE);
             break;
          case WALLCOLOR:
-            image((PImage) wallColors.get(((RoomHome)level.getRoom(0)).getColor(row,col)-1),col * TILE_SIZE, row * TILE_SIZE);
+            //adjusted to no + 1
+            image((PImage) wallColors.get(((RoomHome)level.getRoom(0)).getColor(row,col)),col * TILE_SIZE, row * TILE_SIZE);
 
       }
    }
@@ -436,6 +472,7 @@ public class VirtualMain extends PApplet
 
    public void mousePressed()
    {
+//      System.out.println(mouseX + " " + mouseY);
       if(game)
       {
          Point pressed = mouseToPoint(mouseX, mouseY);
@@ -459,7 +496,8 @@ public class VirtualMain extends PApplet
                {
                   game = false;
                   setup();
-                  System.out.println("You died to lack of energy");
+                  death = "lack of energy!";
+                  //System.out.println("You died to lack of energy");
                }
 
                //suppose to create white spots and despawns entity
@@ -475,7 +513,11 @@ public class VirtualMain extends PApplet
                         entity.setRoom(level.getRoom(randRoom));
                         entity.setMoving(true);
                         entity.makeBoxed();
-                        System.out.println(entity + " got kicked out");
+                        //System.out.println(entity + " got kicked out");
+                        //NNEEEED TO PRINT THISSSSSSSSSSSSS
+
+                        kickedEntityTimer = KICKED_TIME;
+                        kickedEntity = entity.toString();
 
 
 

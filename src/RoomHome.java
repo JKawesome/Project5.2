@@ -185,7 +185,9 @@ public class RoomHome extends Room {
 
     public int getColor(int row, int col) {
         if(wallColors[col][row] == 0){
-            wallColors[col][row] = rand.nextInt(8)+1;
+            //we could just leave it as 0 if it becomes 0 right?
+//            wallColors[col][row] = rand.nextInt(8)+1;
+            wallColors[col][row] = rand.nextInt(8);
         }
         return wallColors[col][row];
     }
