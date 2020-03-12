@@ -19,7 +19,7 @@ public class Level {
     public Level(PImage cambreaker, PImage invisibleMan, PImage runner){
         this.rooms = RoomFactory.createRooms();
         this.currentRoom = rooms[0];
-        this.entities = EntityFactory.createEntity(rooms, cambreaker, invisibleMan, runner);
+        this.entities = EntityFactory.createEntities(rooms, cambreaker, invisibleMan, runner);
         this.energy = TOTAL_ENERGY;
     }
 
@@ -91,5 +91,56 @@ public class Level {
     public int getClickedRoom(Point p)
     {
         return currentRoom.getClickedRoom(p);
+    }
+
+    public void runLevel() {
+        //NEED TO CHANGE THIS TO DO WITH THE LIST
+        if (((Runner) getEntities()[2]).isRunning()) {
+            ((Runner) getEntities()[2]).running();
+            if (changeWorlds(((Runner) getEntities()[2]))) {
+                ((Runner) getEntities()[2]).setRunning();
+            }
+        }
+
+
+
+    }
+
+    public void inEntityRooms(Entity entity){
+        //IN ENTITY ROOMS
+        if (entity.getClass().equals(Runner.class)) {
+            if (!((Runner) entity).isRunning()) {
+                entity.randomMovementTimer();
+                if (entity.getRoom().equals(this.getCurrentRoom())) {
+                    entity.stareDecrease();
+                }
+            }
+        } else if(entity.getClass().equals(CamBreaker.class) &&
+                entity.getRoom().isBlackScreen())
+        {
+            ((CamBreaker)entity).blackScreenTimer();
+        }
+        else
+        {
+            entity.randomMovementTimer();
+            if (entity.getRoom().equals(this.getCurrentRoom())) {
+                entity.stareDecrease();
+            }
+        }
+    }
+
+    public boolean inRoomHome(Entity entity){
+        return entity.getRoom().equals(getRoom(0));
+    }
+
+
+    public boolean changeWorlds(Entity entity)
+    {
+        if(entity.getRoom().isDoor(entity.getPos()))
+        {
+            nextRoom(entity);
+            return true;
+        }
+        return false;
     }
 }

@@ -38,7 +38,8 @@ public class VirtualMain extends PApplet
 
    //Grid portion
    private static final int TILE_SIZE = 32;
-   private ArrayList<Object> wallColors;
+   private ArrayList<PImage> wallColors;
+   private ArrayList<PImage> mapImages;
 
 
    public static enum GridValues { BACKGROUND, OBSTACLE, GOAL, BLACKSCREEN, WALL, FLOOR, DOOR, CAMSCREEN, WALLCOLOR, BOMBING, WHITESCREEN};
@@ -155,6 +156,11 @@ public class VirtualMain extends PApplet
       energyBar.add(loadImage("images/Energy4.png"));
       energyBar.add(loadImage("images/Energy5.png"));
 
+      mapImages = new ArrayList<>();
+      mapImages.add(loadImage("images/map_1.png"));
+      mapImages.add(loadImage("images/map_2.png"));
+      mapImages.add(loadImage("images/map_3.png"));
+
 
       level = new Level(camBreaker, invisibleMan, runner);
       grid = new GridValues[ROWS][COLS];
@@ -219,6 +225,9 @@ public class VirtualMain extends PApplet
 
    public void draw()
    {
+
+
+
       if(game) {
          long time = System.currentTimeMillis();
 
@@ -226,6 +235,16 @@ public class VirtualMain extends PApplet
          fill(255);
          text("Time: " + currentSec, TIME_POSX, TIME_POSY);
 
+
+         if(level.getCurrentRoom().equals(level.getRoom(1))){
+            image(mapImages.get(0), 485,360);
+         }
+         else if(level.getCurrentRoom().equals(level.getRoom(2))){
+            image(mapImages.get(2), 485,360);
+         }
+         else if(level.getCurrentRoom().equals(level.getRoom(3))){
+            image(mapImages.get(1), 485,360);
+         }
 
          image(energyBar.get(level.getEnergyIndex()),
                  level.getEnergyLocation().getX(), level.getEnergyLocation().getY());
@@ -262,7 +281,7 @@ public class VirtualMain extends PApplet
          //EACH SECOND PASSED
          if (next_time < time) {
             next_time = time + SECOND;
-
+            finalSec = currentSec;
             //timer for kicked entity text countdown
             if(kickedEntityTimer >= 0)
             {
@@ -319,7 +338,7 @@ public class VirtualMain extends PApplet
             }
 
             currentSec += 1;
-            finalSec = currentSec;
+
          }
 
          //printing player
